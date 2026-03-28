@@ -255,37 +255,45 @@ async function setStatus(id, status) {
       throw new Error("That order can no longer move to this status.");
     }
 
-    tx.update(orderRef, { status, updatedAt: serverTimestamp() });
-
     const wasActive = prevStatus === "pending" || prevStatus === "ready";
     const becomesTerminal = status === "collected" || status === "cancelled";
+
+    let slotRef = null;
+    let slotSnap = null;
+    let studentRef = null;
+    let studentSnap = null;
+
+    if (wasActive && becomesTerminal && order.slotId) {
+      slotRef = doc(db, "slots", order.slotId);
+      slotSnap = await tx.get(slotRef);
+    }
+
+    if (wasActive && becomesTerminal && order.studentUsername) {
+      studentRef = doc(db, "students", order.studentUsername);
+      studentSnap = await tx.get(studentRef);
+    }
+
+    tx.update(orderRef, { status, updatedAt: serverTimestamp() });
+
     if (!wasActive || !becomesTerminal) {
       return;
     }
 
-    if (order.slotId) {
-      const slotRef = doc(db, "slots", order.slotId);
-      const slotSnap = await tx.get(slotRef);
-      if (slotSnap.exists()) {
-        const slotData = slotSnap.data() || {};
-        tx.set(
-          slotRef,
-          {
-            capacity: clampCapacity(slotData.capacity),
-            activeCount: Math.max(0, safeInt(slotData.activeCount) - 1),
-            updatedAt: serverTimestamp(),
-          },
-          { merge: true }
-        );
-      }
+    if (slotRef && slotSnap?.exists()) {
+      const slotData = slotSnap.data() || {};
+      tx.set(
+        slotRef,
+        {
+          capacity: clampCapacity(slotData.capacity),
+          activeCount: Math.max(0, safeInt(slotData.activeCount) - 1),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
     }
 
-    if (order.studentUsername) {
-      const studentRef = doc(db, "students", order.studentUsername);
-      const studentSnap = await tx.get(studentRef);
-      if (studentSnap.exists() && studentSnap.data()?.activeOrderId === id) {
-        tx.set(studentRef, { activeOrderId: null }, { merge: true });
-      }
+    if (studentRef && studentSnap?.exists() && studentSnap.data()?.activeOrderId === id) {
+      tx.set(studentRef, { activeOrderId: null }, { merge: true });
     }
   });
 }
