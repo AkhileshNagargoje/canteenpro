@@ -1,4 +1,4 @@
-import { db } from "./firebase.js";
+import { db, storage } from "./firebase.js";
 import {
   collection,
   doc,
@@ -10,8 +10,14 @@ import {
   runTransaction,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
 
 const SESSION_KEY = "canteen_admin_unlocked";
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const PRICE_FORMATTER = new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "INR",
@@ -90,6 +96,34 @@ function normalizeMenuDoc(id, data) {
   };
 }
 
+function sanitizeFileName(name) {
+  return String(name || "image")
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80) || "image";
+}
+
+async function uploadMenuImage(menuItemId, file) {
+  if (!file) {
+    throw new Error("Choose an image first.");
+  }
+  if (!String(file.type || "").startsWith("image/")) {
+    throw new Error("Only image files are allowed.");
+  }
+  if (file.size > MAX_IMAGE_BYTES) {
+    throw new Error("Image is too large. Use a file under 5 MB.");
+  }
+
+  const objectRef = storageRef(storage, `menu-images/${menuItemId}/${Date.now()}-${sanitizeFileName(file.name)}`);
+  await uploadBytes(objectRef, file, {
+    contentType: file.type || "image/jpeg",
+    cacheControl: "public,max-age=3600",
+  });
+  return await getDownloadURL(objectRef);
+}
+
 function openQuickAdd() {
   hidePageError();
   quickAddModal.hidden = false;
@@ -110,6 +144,17 @@ async function runMenuTask(task, fallbackMessage) {
     console.error(err);
     showPageError(err?.message || fallbackMessage);
     return false;
+  }
+}
+
+async function runMenuValueTask(task, fallbackMessage) {
+  try {
+    hidePageError();
+    return await task();
+  } catch (err) {
+    console.error(err);
+    showPageError(err?.message || fallbackMessage);
+    return null;
   }
 }
 
@@ -134,21 +179,27 @@ function renderMenuRow(item) {
 
   const preview = document.createElement("div");
   preview.className = "menu-editor-preview";
-  if (item.imageUrl) {
-    const img = document.createElement("img");
-    img.src = item.imageUrl;
-    img.alt = item.name;
-    img.addEventListener(
-      "error",
-      () => {
-        preview.textContent = item.name.slice(0, 1).toUpperCase();
-      },
-      { once: true }
-    );
-    preview.appendChild(img);
-  } else {
-    preview.textContent = item.name.slice(0, 1).toUpperCase();
-  }
+
+  const renderPreview = (imageUrl, displayName) => {
+    preview.innerHTML = "";
+    if (imageUrl) {
+      const img = document.createElement("img");
+      img.src = imageUrl;
+      img.alt = displayName;
+      img.addEventListener(
+        "error",
+        () => {
+          preview.textContent = String(displayName || "?").slice(0, 1).toUpperCase();
+        },
+        { once: true }
+      );
+      preview.appendChild(img);
+      return;
+    }
+    preview.textContent = String(displayName || "?").slice(0, 1).toUpperCase();
+  };
+
+  renderPreview(item.imageUrl, item.name);
 
   const body = document.createElement("div");
   body.className = "menu-editor-body";
@@ -187,6 +238,59 @@ function renderMenuRow(item) {
   fields.appendChild(categoryInput);
   fields.appendChild(imageInput);
 
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/*";
+  fileInput.hidden = true;
+
+  let uploadBusy = false;
+  const uploadTools = document.createElement("div");
+  uploadTools.className = "menu-upload-tools";
+
+  const uploadBtn = document.createElement("button");
+  uploadBtn.type = "button";
+  uploadBtn.className = "btn-secondary btn-small";
+  uploadBtn.textContent = "Upload image";
+
+  const uploadStatus = document.createElement("div");
+  uploadStatus.className = "list-subtext menu-upload-status";
+  uploadStatus.textContent = item.imageUrl ? "Image attached." : "No image uploaded yet.";
+
+  const setUploadBusy = (busy) => {
+    uploadBusy = busy;
+    uploadBtn.disabled = busy;
+    uploadBtn.textContent = busy ? "Uploading..." : "Upload image";
+    fileInput.disabled = busy;
+  };
+
+  uploadBtn.addEventListener("click", () => {
+    if (!uploadBusy) fileInput.click();
+  });
+
+  fileInput.addEventListener("change", async () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    setUploadBusy(true);
+    uploadStatus.textContent = `Uploading ${file.name}...`;
+
+    const url = await runMenuValueTask(() => uploadMenuImage(item.id, file), "Could not upload image.");
+    if (url) {
+      imageInput.value = url;
+      renderPreview(url, nameInput.value.trim() || item.name);
+      uploadStatus.textContent = `${file.name} uploaded. Click Apply to save.`;
+    } else {
+      uploadStatus.textContent = item.imageUrl ? "Image attached." : "No image uploaded yet.";
+    }
+
+    fileInput.value = "";
+    setUploadBusy(false);
+  });
+
+  uploadTools.appendChild(uploadBtn);
+  uploadTools.appendChild(uploadStatus);
+  uploadTools.appendChild(fileInput);
+
   const meta = document.createElement("div");
   meta.className = "list-subtext";
   meta.textContent = `${categoryLabel(item.category)} | ${item.available ? "Available" : "Sold out"} | ${formatPrice(item.price)}`;
@@ -199,6 +303,11 @@ function renderMenuRow(item) {
   applyBtn.className = "btn-primary btn-small";
   applyBtn.textContent = "Apply";
   applyBtn.addEventListener("click", async () => {
+    if (uploadBusy) {
+      showPageError("Wait for the image upload to finish first.");
+      return;
+    }
+
     const name = nameInput.value.trim();
     if (!name) {
       showPageError("Item name cannot be empty.");
@@ -268,6 +377,7 @@ function renderMenuRow(item) {
   actions.appendChild(del);
 
   body.appendChild(fields);
+  body.appendChild(uploadTools);
   body.appendChild(meta);
   body.appendChild(actions);
   bodyWrap.appendChild(preview);
@@ -332,15 +442,15 @@ async function boot() {
       hidePageError();
       menuList.innerHTML = "";
       const items = snap.docs.map((x) => normalizeMenuDoc(x.id, x.data()));
-      if (activeEditorItemId && !items.some((item) => item.id === activeEditorItemId)) {
+      if (activeEditorItemId && !items.some((menuItem) => menuItem.id === activeEditorItemId)) {
         activeEditorItemId = null;
       }
       if (items.length === 0) {
         menuList.innerHTML = '<p class="muted" style="margin:0">No menu items yet.</p>';
         return;
       }
-      for (const item of items) {
-        menuList.appendChild(renderMenuRow(item));
+      for (const menuItem of items) {
+        menuList.appendChild(renderMenuRow(menuItem));
       }
     },
     (err) => {

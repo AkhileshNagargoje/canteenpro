@@ -17,6 +17,7 @@ Small **student ordering** app + **staff dashboard** with **Firestore** only. **
    npm install
    npx firebase login
    npm run deploy:rules
+   npm run deploy:storage
    ```
 
 4. Run locally:

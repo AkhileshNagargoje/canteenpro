@@ -1109,6 +1109,17 @@ button {
   gap: 14px;
 }
 
+.menu-upload-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.menu-upload-status {
+  min-height: 1.2em;
+}
+
 .menu-editor-body .row-actions {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1238,6 +1249,10 @@ button {
   .list-editor-item,
   .quick-add-card {
     grid-template-columns: 1fr;
+  }
+
+  .menu-upload-tools {
+    align-items: stretch;
   }
 
   .menu-editor-body .row-actions {
