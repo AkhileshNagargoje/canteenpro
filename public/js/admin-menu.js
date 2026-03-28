@@ -31,6 +31,8 @@ const quickAddForm = document.getElementById("quick-add-form");
 const quickAddCancel = document.getElementById("quick-add-cancel");
 const lockBtn = document.getElementById("lock-btn");
 
+let activeEditorItemId = null;
+
 if (sessionStorage.getItem(SESSION_KEY) !== "1") {
   location.replace("admin.html");
 }
@@ -114,6 +116,8 @@ async function runMenuTask(task, fallbackMessage) {
 function renderMenuRow(item) {
   const wrap = document.createElement("details");
   wrap.className = "menu-editor-card" + (item.enabled === false ? " pill-off" : "");
+  wrap.dataset.itemId = item.id;
+  wrap.open = activeEditorItemId === item.id;
 
   const summary = document.createElement("summary");
   summary.className = "menu-editor-summary";
@@ -268,6 +272,13 @@ function renderMenuRow(item) {
   bodyWrap.appendChild(body);
   wrap.appendChild(summary);
   wrap.appendChild(bodyWrap);
+  wrap.addEventListener("toggle", () => {
+    if (wrap.open) {
+      activeEditorItemId = item.id;
+    } else if (activeEditorItemId === item.id) {
+      activeEditorItemId = null;
+    }
+  });
   return wrap;
 }
 
@@ -319,6 +330,9 @@ async function boot() {
       hidePageError();
       menuList.innerHTML = "";
       const items = snap.docs.map((x) => normalizeMenuDoc(x.id, x.data()));
+      if (activeEditorItemId && !items.some((item) => item.id === activeEditorItemId)) {
+        activeEditorItemId = null;
+      }
       if (items.length === 0) {
         menuList.innerHTML = '<p class="muted" style="margin:0">No menu items yet.</p>';
         return;
