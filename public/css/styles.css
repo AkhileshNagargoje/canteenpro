@@ -1016,10 +1016,30 @@ button {
   opacity: 0.72;
 }
 
+.menu-page-panel {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 26px;
+}
+
+.menu-page-panel > .panel-head {
+  gap: 10px;
+}
+
+.menu-page-panel > .menu-toolbar {
+  margin-top: -2px;
+}
+
+.menu-page-panel > #menu-list {
+  display: grid;
+  gap: 16px;
+}
+
 .menu-toolbar {
   display: flex;
   justify-content: flex-start;
-  margin-bottom: 6px;
+  margin-bottom: 0;
 }
 
 .menu-editor-card {
