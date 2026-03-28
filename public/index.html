@@ -68,21 +68,15 @@
                   <span class="section-tag">Live menu</span>
                   <h2 id="menu-section">Today's menu</h2>
                 </div>
-                <div class="identity-banner identity-banner-inline">
-                  <div>
-                    <span class="section-tag">Ordering as</span>
-                    <p><strong id="order-username">@student</strong></p>
-                  </div>
-                  <span class="identity-chip">Pickup ready</span>
-                </div>
               </div>
+
+              <span id="order-username" hidden>@student</span>
 
               <div class="menu-browser-head menu-browser-head-tabs" id="menu-section-tabs" role="tablist">
                 <button type="button" class="menu-tag active" data-section="snacks">Snacks</button>
                 <button type="button" class="menu-tag" data-section="cook_to_order">Made on order</button>
                 <button type="button" class="menu-tag" data-section="drinks">Drinks</button>
               </div>
-              <p id="menu-section-note" class="menu-section-note">Snacks are prepared in bulk and ready for quick pickup.</p>
 
               <section class="menu-browser">
                 <div id="menu-grid" class="menu-grid menu-grid-restaurant" aria-live="polite"></div>
