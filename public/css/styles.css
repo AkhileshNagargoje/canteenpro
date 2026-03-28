@@ -330,6 +330,10 @@ p {
   color: var(--muted);
 }
 
+.panel-head p {
+  max-width: 58ch;
+}
+
 .auth-card-inline {
   max-width: 580px;
   margin-top: 22px;
@@ -879,8 +883,8 @@ button {
 
 .order-item-thumb,
 .menu-editor-preview {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
 }
 
 .order-item-copy {
@@ -1015,6 +1019,7 @@ button {
 .menu-toolbar {
   display: flex;
   justify-content: flex-start;
+  margin-bottom: 6px;
 }
 
 .menu-editor-card {
@@ -1034,7 +1039,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 16px 18px;
+  padding: 18px 20px;
   cursor: pointer;
   list-style: none;
 }
@@ -1049,34 +1054,61 @@ button {
 }
 
 .menu-editor-summary-hint {
+  min-width: 74px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #fff8ed;
   color: var(--accent-strong);
   font-size: 0.82rem;
   font-weight: 700;
+  text-align: center;
 }
 
 .menu-editor-card[open] .menu-editor-summary-hint {
   color: var(--success);
+  background: #ebfff1;
 }
 
 .menu-editor-panel {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr);
-  gap: 14px;
-  padding: 0 18px 18px;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 0 20px 20px;
 }
 
 .menu-editor-body {
   gap: 14px;
 }
 
+.menu-editor-body .row-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.menu-editor-body .row-actions > button {
+  width: 100%;
+  min-height: 44px;
+  justify-content: center;
+}
+
 .quick-add-card {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+  align-items: end;
+}
+
+.quick-add-card .field-group:first-child,
+.quick-add-actions {
+  grid-column: 1 / -1;
 }
 
 .quick-add-actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 10px;
 }
 
@@ -1175,8 +1207,13 @@ button {
   .selection-card,
   .draft-order-item,
   .menu-card,
-  .list-editor-item {
+  .list-editor-item,
+  .quick-add-card {
     grid-template-columns: 1fr;
+  }
+
+  .menu-editor-body .row-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .menu-grid,
