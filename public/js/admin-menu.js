@@ -353,9 +353,16 @@ quickAddModal?.addEventListener("click", (e) => {
 quickAddForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const nameInput = document.getElementById("new-menu-name");
+  const priceInput = document.getElementById("new-menu-price");
   const categoryInput = document.getElementById("new-menu-category");
   const name = nameInput.value.trim();
   if (!name) return;
+
+  const price = parsePriceInput(priceInput.value);
+  if (priceInput.value.trim() && price == null) {
+    showPageError("Enter a valid price or leave it blank.");
+    return;
+  }
 
   const ok = await runMenuTask(
     () =>
@@ -363,7 +370,7 @@ quickAddForm.addEventListener("submit", async (e) => {
         name,
         category: normalizeMenuCategory(categoryInput.value),
         imageUrl: "",
-        price: null,
+        price,
         available: true,
         enabled: true,
         sortOrder: Date.now(),
