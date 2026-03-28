@@ -160,18 +160,6 @@ function renderMenuRow(item) {
   nameInput.type = "text";
   nameInput.value = item.name;
   nameInput.placeholder = "Item name";
-  nameInput.addEventListener("change", async () => {
-    const name = nameInput.value.trim();
-    if (!name) {
-      nameInput.value = item.name;
-      return;
-    }
-    const ok = await runMenuTask(
-      () => updateMenu(item.id, { name, updatedAt: serverTimestamp() }),
-      "Could not update item name."
-    );
-    if (!ok) nameInput.value = item.name;
-  });
 
   const priceInput = document.createElement("input");
   priceInput.type = "number";
@@ -179,14 +167,6 @@ function renderMenuRow(item) {
   priceInput.step = "1";
   priceInput.value = item.price == null ? "" : String(item.price);
   priceInput.placeholder = "Price";
-  priceInput.addEventListener("change", async () => {
-    const nextPrice = parsePriceInput(priceInput.value);
-    const ok = await runMenuTask(
-      () => updateMenu(item.id, { price: nextPrice, updatedAt: serverTimestamp() }),
-      "Could not update item price."
-    );
-    if (!ok) priceInput.value = item.price == null ? "" : String(item.price);
-  });
 
   const categoryInput = document.createElement("select");
   Object.entries(MENU_CATEGORIES).forEach(([value, label]) => {
@@ -196,27 +176,11 @@ function renderMenuRow(item) {
     categoryInput.appendChild(option);
   });
   categoryInput.value = item.category;
-  categoryInput.addEventListener("change", async () => {
-    const nextCategory = normalizeMenuCategory(categoryInput.value);
-    const ok = await runMenuTask(
-      () => updateMenu(item.id, { category: nextCategory, updatedAt: serverTimestamp() }),
-      "Could not update item type."
-    );
-    if (!ok) categoryInput.value = item.category;
-  });
 
   const imageInput = document.createElement("input");
   imageInput.type = "text";
   imageInput.value = item.imageUrl;
   imageInput.placeholder = "Image URL";
-  imageInput.addEventListener("change", async () => {
-    const imageUrl = imageInput.value.trim();
-    const ok = await runMenuTask(
-      () => updateMenu(item.id, { imageUrl, updatedAt: serverTimestamp() }),
-      "Could not update item image."
-    );
-    if (!ok) imageInput.value = item.imageUrl;
-  });
 
   fields.appendChild(nameInput);
   fields.appendChild(priceInput);
@@ -229,6 +193,43 @@ function renderMenuRow(item) {
 
   const actions = document.createElement("div");
   actions.className = "row-actions";
+
+  const applyBtn = document.createElement("button");
+  applyBtn.type = "button";
+  applyBtn.className = "btn-primary btn-small";
+  applyBtn.textContent = "Apply";
+  applyBtn.addEventListener("click", async () => {
+    const name = nameInput.value.trim();
+    if (!name) {
+      showPageError("Item name cannot be empty.");
+      nameInput.focus();
+      return;
+    }
+
+    const price = parsePriceInput(priceInput.value);
+    if (priceInput.value.trim() && price == null) {
+      showPageError("Enter a valid price or leave it blank.");
+      priceInput.focus();
+      return;
+    }
+
+    const ok = await runMenuTask(
+      () =>
+        updateMenu(item.id, {
+          name,
+          price,
+          category: normalizeMenuCategory(categoryInput.value),
+          imageUrl: imageInput.value.trim(),
+          updatedAt: serverTimestamp(),
+        }),
+      "Could not apply changes."
+    );
+
+    if (ok) {
+      activeEditorItemId = null;
+      wrap.open = false;
+    }
+  });
 
   const availabilityBtn = document.createElement("button");
   availabilityBtn.type = "button";
@@ -261,6 +262,7 @@ function renderMenuRow(item) {
     await runMenuTask(() => deleteDoc(doc(db, "menu", item.id)), "Could not remove menu item.");
   });
 
+  actions.appendChild(applyBtn);
   actions.appendChild(availabilityBtn);
   actions.appendChild(visibilityBtn);
   actions.appendChild(del);
