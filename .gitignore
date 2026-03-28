@@ -1,0 +1,4 @@
+.firebase/
+*.local
+serviceAccountKey.json
+node_modules/

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Canteen pre-order</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <main>
+      <div class="topbar">
+        <span id="student-label" class="muted" style="font-size: 0.85rem"></span>
+        <div class="row-actions" style="margin: 0; justify-content: flex-end">
+          <button type="button" class="btn-secondary btn-small" id="student-sign-out" hidden>Sign out</button>
+          <a href="admin.html">Staff</a>
+        </div>
+      </div>
+
+      <h1>Pre-order lunch</h1>
+      <p class="tagline">Pick your meal and slot - skip the rush.</p>
+
+      <div id="config-error" class="banner banner-error" hidden></div>
+
+      <div id="auth-card" class="card">
+        <h2 class="h-inline">Student</h2>
+        <p class="muted" style="margin: 0.35rem 0 0.75rem; font-size: 0.9rem">
+          Username + PIN are saved in Firestore. First time here: use <strong>Create account</strong>.
+        </p>
+
+        <div class="tabs">
+          <button type="button" class="tab active" id="tab-login">Sign in</button>
+          <button type="button" class="tab" id="tab-register">Create account</button>
+        </div>
+
+        <form id="auth-form">
+          <label for="auth-username">Username</label>
+          <input
+            id="auth-username"
+            type="text"
+            autocomplete="username"
+            required
+            maxlength="32"
+            placeholder="e.g. priya_s"
+          />
+
+          <label for="auth-pin">PIN</label>
+          <input
+            id="auth-pin"
+            type="password"
+            autocomplete="new-password"
+            required
+            minlength="4"
+            maxlength="64"
+            placeholder="Min 4 characters"
+          />
+
+          <p id="auth-error" class="muted" style="color: var(--danger); margin: 0.35rem 0 0; min-height: 1.2em"></p>
+          <button type="submit" class="btn-primary" id="auth-submit">Sign in</button>
+        </form>
+      </div>
+
+      <div id="order-app" hidden>
+        <form id="order-form" class="card" autocomplete="on">
+          <label for="student-name">Your name (for pickup)</label>
+          <input
+            id="student-name"
+            name="studentName"
+            type="text"
+            required
+            maxlength="80"
+            placeholder="e.g. Priya Sharma"
+          />
+
+          <label for="menu-item">Food item</label>
+          <select id="menu-item" name="menuItem" required>
+            <option value="">Loading menu...</option>
+          </select>
+
+          <label for="quantity">Quantity</label>
+          <input id="quantity" name="quantity" type="number" min="1" max="99" value="1" required />
+
+          <label for="slot">Pickup time</label>
+          <select id="slot" name="slot" required>
+            <option value="">Loading slots...</option>
+          </select>
+          <p id="slot-help" class="muted form-note" style="margin: 0.45rem 0 0"></p>
+
+          <button type="submit" class="btn-primary" id="submit-btn">Place order</button>
+          <p id="order-help" class="muted form-note" style="margin: 0.65rem 0 0; min-height: 1.2em"></p>
+        </form>
+
+        <div id="confirmation" class="card banner-success" hidden>
+          <p class="muted" style="margin: 0 0 0.25rem">Your order</p>
+          <p class="order-id" id="confirm-id"></p>
+          <p id="confirm-status" class="muted" style="margin: 0.35rem 0 0; font-weight: 600"></p>
+          <p class="muted" style="margin: 0.5rem 0 0">Show this number at the counter. This stays here until the order is collected.</p>
+          <p id="active-order-note" class="muted" style="margin: 0.85rem 0 0">
+            You can place another order after this one is collected or cancelled.
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="js/student.js"></script>
+  </body>
+</html>
