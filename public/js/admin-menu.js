@@ -1,4 +1,4 @@
-import { db, storage } from "./firebase.js";
+import { db } from "./firebase.js";
 import {
   collection,
   doc,
@@ -10,14 +10,8 @@ import {
   runTransaction,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-import {
-  ref as storageRef,
-  uploadBytes,
-  getDownloadURL,
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-storage.js";
 
 const SESSION_KEY = "canteen_admin_unlocked";
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const PRICE_FORMATTER = new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "INR",
@@ -79,6 +73,12 @@ function parsePriceInput(value) {
   return safePrice(trimmed);
 }
 
+function normalizeImagePath(value) {
+  const trimmed = String(value ?? "").trim().replace(/^\/+/, "");
+  if (!trimmed) return "";
+  return trimmed;
+}
+
 function formatPrice(value) {
   return value == null ? "No price" : PRICE_FORMATTER.format(value);
 }
@@ -94,34 +94,6 @@ function normalizeMenuDoc(id, data) {
     enabled: data?.enabled !== false,
     sortOrder: safeInt(data?.sortOrder, 0),
   };
-}
-
-function sanitizeFileName(name) {
-  return String(name || "image")
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 80) || "image";
-}
-
-async function uploadMenuImage(menuItemId, file) {
-  if (!file) {
-    throw new Error("Choose an image first.");
-  }
-  if (!String(file.type || "").startsWith("image/")) {
-    throw new Error("Only image files are allowed.");
-  }
-  if (file.size > MAX_IMAGE_BYTES) {
-    throw new Error("Image is too large. Use a file under 5 MB.");
-  }
-
-  const objectRef = storageRef(storage, `menu-images/${menuItemId}/${Date.now()}-${sanitizeFileName(file.name)}`);
-  await uploadBytes(objectRef, file, {
-    contentType: file.type || "image/jpeg",
-    cacheControl: "public,max-age=3600",
-  });
-  return await getDownloadURL(objectRef);
 }
 
 function openQuickAdd() {
@@ -144,17 +116,6 @@ async function runMenuTask(task, fallbackMessage) {
     console.error(err);
     showPageError(err?.message || fallbackMessage);
     return false;
-  }
-}
-
-async function runMenuValueTask(task, fallbackMessage) {
-  try {
-    hidePageError();
-    return await task();
-  } catch (err) {
-    console.error(err);
-    showPageError(err?.message || fallbackMessage);
-    return null;
   }
 }
 
@@ -228,64 +189,26 @@ function renderMenuRow(item) {
   });
   categoryInput.value = item.category;
 
-  let pendingImageUrl = item.imageUrl;
+  const imageInput = document.createElement("input");
+  imageInput.type = "text";
+  imageInput.value = item.imageUrl;
+  imageInput.placeholder = "images/samosa.jpg";
+  imageInput.addEventListener("input", () => {
+    renderPreview(normalizeImagePath(imageInput.value), nameInput.value.trim() || item.name);
+  });
+
+  nameInput.addEventListener("input", () => {
+    renderPreview(normalizeImagePath(imageInput.value), nameInput.value.trim() || item.name);
+  });
 
   fields.appendChild(nameInput);
   fields.appendChild(priceInput);
   fields.appendChild(categoryInput);
+  fields.appendChild(imageInput);
 
-  const fileInput = document.createElement("input");
-  fileInput.type = "file";
-  fileInput.accept = "image/*";
-  fileInput.hidden = true;
-
-  let uploadBusy = false;
-  const uploadTools = document.createElement("div");
-  uploadTools.className = "menu-upload-tools";
-
-  const uploadBtn = document.createElement("button");
-  uploadBtn.type = "button";
-  uploadBtn.className = "btn-secondary btn-small";
-  uploadBtn.textContent = "Upload image";
-
-  const uploadStatus = document.createElement("div");
-  uploadStatus.className = "list-subtext menu-upload-status";
-  uploadStatus.textContent = item.imageUrl ? "Image attached." : "No image uploaded yet.";
-
-  const setUploadBusy = (busy) => {
-    uploadBusy = busy;
-    uploadBtn.disabled = busy;
-    uploadBtn.textContent = busy ? "Uploading..." : "Upload image";
-    fileInput.disabled = busy;
-  };
-
-  uploadBtn.addEventListener("click", () => {
-    if (!uploadBusy) fileInput.click();
-  });
-
-  fileInput.addEventListener("change", async () => {
-    const file = fileInput.files?.[0];
-    if (!file) return;
-
-    setUploadBusy(true);
-    uploadStatus.textContent = `Uploading ${file.name}...`;
-
-    const url = await runMenuValueTask(() => uploadMenuImage(item.id, file), "Could not upload image.");
-    if (url) {
-      pendingImageUrl = url;
-      renderPreview(url, nameInput.value.trim() || item.name);
-      uploadStatus.textContent = `${file.name} uploaded. Click Apply to save.`;
-    } else {
-      uploadStatus.textContent = item.imageUrl ? "Image attached." : "No image uploaded yet.";
-    }
-
-    fileInput.value = "";
-    setUploadBusy(false);
-  });
-
-  uploadTools.appendChild(uploadBtn);
-  uploadTools.appendChild(uploadStatus);
-  uploadTools.appendChild(fileInput);
+  const imageHint = document.createElement("div");
+  imageHint.className = "list-subtext";
+  imageHint.textContent = "Put food photos in public/images and enter paths like images/samosa.jpg.";
 
   const meta = document.createElement("div");
   meta.className = "list-subtext";
@@ -299,11 +222,6 @@ function renderMenuRow(item) {
   applyBtn.className = "btn-primary btn-small";
   applyBtn.textContent = "Apply";
   applyBtn.addEventListener("click", async () => {
-    if (uploadBusy) {
-      showPageError("Wait for the image upload to finish first.");
-      return;
-    }
-
     const name = nameInput.value.trim();
     if (!name) {
       showPageError("Item name cannot be empty.");
@@ -324,7 +242,7 @@ function renderMenuRow(item) {
           name,
           price,
           category: normalizeMenuCategory(categoryInput.value),
-          imageUrl: pendingImageUrl,
+          imageUrl: normalizeImagePath(imageInput.value),
           updatedAt: serverTimestamp(),
         }),
       "Could not apply changes."
@@ -373,7 +291,7 @@ function renderMenuRow(item) {
   actions.appendChild(del);
 
   body.appendChild(fields);
-  body.appendChild(uploadTools);
+  body.appendChild(imageHint);
   body.appendChild(meta);
   body.appendChild(actions);
   bodyWrap.appendChild(preview);

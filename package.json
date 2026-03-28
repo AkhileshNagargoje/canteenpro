@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "deploy:rules": "firebase deploy --only firestore:rules",
-    "deploy:storage": "firebase deploy --only storage",
     "deploy:hosting": "firebase deploy --only hosting"
   },
   "devDependencies": {
