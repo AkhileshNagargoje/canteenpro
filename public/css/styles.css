@@ -120,6 +120,10 @@ a {
   z-index: 20;
 }
 
+.admin-page .shell-top {
+  position: static;
+}
+
 .app-bar {
   display: flex;
   align-items: center;
@@ -132,6 +136,10 @@ a {
   background: linear-gradient(135deg, rgba(19, 29, 51, 0.96), rgba(28, 40, 71, 0.96));
   box-shadow: 0 24px 50px rgba(15, 23, 42, 0.22);
   backdrop-filter: blur(16px);
+}
+
+.admin-page .app-bar {
+  margin-top: 18px;
 }
 
 .app-bar-restaurant {
@@ -1020,7 +1028,7 @@ button {
   display: grid;
   gap: 16px;
   margin-top: 16px;
-  padding-top: 26px;
+  padding-top: 18px;
 }
 
 .menu-page-panel > .panel-head {
