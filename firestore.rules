@@ -13,6 +13,14 @@ service cloud.firestore {
       return username.matches('^[a-z0-9_]{3,32}$');
     }
 
+    function validPrice(value) {
+      return value == null || value is int || value is float;
+    }
+
+    function validMenuCategory(value) {
+      return value == 'snacks' || value == 'cook_to_order' || value == 'drinks';
+    }
+
     function validStudentData() {
       return request.resource.data.keys().hasOnly(['pin', 'createdAt', 'activeOrderId']) &&
         request.resource.data.pin is string &&
@@ -26,8 +34,14 @@ service cloud.firestore {
     }
 
     function validMenuData() {
-      return request.resource.data.keys().hasOnly(['name', 'enabled', 'sortOrder', 'updatedAt']) &&
+      return request.resource.data.keys().hasOnly(['name', 'category', 'imageUrl', 'price', 'available', 'enabled', 'sortOrder', 'updatedAt']) &&
         validName(request.resource.data.name, 80) &&
+        validMenuCategory(request.resource.data.category) &&
+        request.resource.data.imageUrl is string &&
+        request.resource.data.imageUrl.size() <= 500 &&
+        validPrice(request.resource.data.price) &&
+        (request.resource.data.price == null || (request.resource.data.price >= 0 && request.resource.data.price <= 100000)) &&
+        request.resource.data.available is bool &&
         request.resource.data.enabled is bool &&
         request.resource.data.sortOrder is int &&
         request.resource.data.updatedAt is timestamp;
@@ -47,14 +61,60 @@ service cloud.firestore {
         request.resource.data.activeCount <= request.resource.data.capacity;
     }
 
+    function validOrderItem(item) {
+      return item is map &&
+        item.keys().hasOnly(['menuItemId', 'menuItemName', 'quantity', 'price']) &&
+        validDocId(item.menuItemId) &&
+        validName(item.menuItemName, 80) &&
+        item.quantity is int &&
+        item.quantity >= 1 &&
+        item.quantity <= 99 &&
+        validPrice(item.price) &&
+        (item.price == null || (item.price >= 0 && item.price <= 100000));
+    }
+
+    function validOrderItemsList() {
+      return (request.resource.data.items.size() < 1 || validOrderItem(request.resource.data.items[0])) &&
+        (request.resource.data.items.size() < 2 || validOrderItem(request.resource.data.items[1])) &&
+        (request.resource.data.items.size() < 3 || validOrderItem(request.resource.data.items[2])) &&
+        (request.resource.data.items.size() < 4 || validOrderItem(request.resource.data.items[3])) &&
+        (request.resource.data.items.size() < 5 || validOrderItem(request.resource.data.items[4])) &&
+        (request.resource.data.items.size() < 6 || validOrderItem(request.resource.data.items[5])) &&
+        (request.resource.data.items.size() < 7 || validOrderItem(request.resource.data.items[6])) &&
+        (request.resource.data.items.size() < 8 || validOrderItem(request.resource.data.items[7])) &&
+        (request.resource.data.items.size() < 9 || validOrderItem(request.resource.data.items[8])) &&
+        (request.resource.data.items.size() < 10 || validOrderItem(request.resource.data.items[9])) &&
+        (request.resource.data.items.size() < 11 || validOrderItem(request.resource.data.items[10])) &&
+        (request.resource.data.items.size() < 12 || validOrderItem(request.resource.data.items[11])) &&
+        (request.resource.data.items.size() < 13 || validOrderItem(request.resource.data.items[12])) &&
+        (request.resource.data.items.size() < 14 || validOrderItem(request.resource.data.items[13])) &&
+        (request.resource.data.items.size() < 15 || validOrderItem(request.resource.data.items[14])) &&
+        (request.resource.data.items.size() < 16 || validOrderItem(request.resource.data.items[15])) &&
+        (request.resource.data.items.size() < 17 || validOrderItem(request.resource.data.items[16])) &&
+        (request.resource.data.items.size() < 18 || validOrderItem(request.resource.data.items[17])) &&
+        (request.resource.data.items.size() < 19 || validOrderItem(request.resource.data.items[18])) &&
+        (request.resource.data.items.size() < 20 || validOrderItem(request.resource.data.items[19]));
+    }
+
+    function qtyAt(index) {
+      return request.resource.data.items.size() > index && request.resource.data.items[index].quantity is int
+        ? request.resource.data.items[index].quantity
+        : 0;
+    }
+
+    function totalRequestedQuantity() {
+      return qtyAt(0) + qtyAt(1) + qtyAt(2) + qtyAt(3) + qtyAt(4) + qtyAt(5) + qtyAt(6) + qtyAt(7) + qtyAt(8) + qtyAt(9) +
+        qtyAt(10) + qtyAt(11) + qtyAt(12) + qtyAt(13) + qtyAt(14) + qtyAt(15) + qtyAt(16) + qtyAt(17) + qtyAt(18) + qtyAt(19);
+    }
+
     function validOrderCreate(orderId) {
       return request.resource.data.keys().hasOnly([
           'displayId',
           'studentUsername',
           'studentName',
-          'menuItemId',
-          'menuItemName',
-          'quantity',
+          'items',
+          'itemCount',
+          'totalQuantity',
           'slotId',
           'slotLabel',
           'status',
@@ -65,13 +125,18 @@ service cloud.firestore {
         request.resource.data.displayId.matches('^#A[0-9]{3,}$') &&
         validUsername(request.resource.data.studentUsername) &&
         validName(request.resource.data.studentName, 80) &&
-        validDocId(request.resource.data.menuItemId) &&
-        validName(request.resource.data.menuItemName, 80) &&
+        request.resource.data.items is list &&
+        request.resource.data.items.size() >= 1 &&
+        request.resource.data.items.size() <= 20 &&
+        validOrderItemsList() &&
+        request.resource.data.itemCount is int &&
+        request.resource.data.itemCount == request.resource.data.items.size() &&
+        request.resource.data.totalQuantity is int &&
+        request.resource.data.totalQuantity >= 1 &&
+        request.resource.data.totalQuantity <= 500 &&
+        request.resource.data.totalQuantity == totalRequestedQuantity() &&
         validDocId(request.resource.data.slotId) &&
         validName(request.resource.data.slotLabel, 60) &&
-        request.resource.data.quantity is int &&
-        request.resource.data.quantity >= 1 &&
-        request.resource.data.quantity <= 99 &&
         request.resource.data.status == 'pending' &&
         request.resource.data.createdAt is timestamp;
     }

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Canteen Pro Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="admin-page">
+    <main class="shell shell-admin">
+      <header class="shell-top app-bar">
+        <div class="brand-area brand-cluster">
+          <div class="brand-mark">CP</div>
+          <div>
+            <span class="brand-name">Canteen operations</span>
+            <h1>Menu management</h1>
+          </div>
+        </div>
+        <div class="utility-area">
+          <a class="plain-link" href="admin.html">Dashboard</a>
+          <a class="plain-link" href="index.html">Student</a>
+          <button type="button" class="btn-secondary btn-small" id="lock-btn">Lock</button>
+        </div>
+      </header>
+
+      <section class="panel panel-surface panel-form">
+        <div class="panel-head panel-head-clean compact-head">
+          <div>
+            <span class="section-tag">Menu studio</span>
+            <h2>Items</h2>
+          </div>
+          <p>Use add item for a quick create, then open any item to edit more details.</p>
+        </div>
+
+        <div id="menu-page-error" class="banner banner-error" hidden></div>
+
+        <div class="menu-toolbar">
+          <button type="button" class="btn-primary btn-inline" id="add-item-toggle">Add item</button>
+        </div>
+
+        <div id="quick-add-modal" class="modal-shell" hidden>
+          <div class="modal-backdrop" data-close-modal="true"></div>
+          <div class="modal-card quick-add-modal-card" role="dialog" aria-modal="true" aria-labelledby="quick-add-title">
+            <div class="panel-head panel-head-clean compact-head">
+              <div>
+                <span class="section-tag">Quick add</span>
+                <h2 id="quick-add-title">Add item</h2>
+              </div>
+              <p>Add the basic item first. You can open it later and fill in image, price, and availability.</p>
+            </div>
+
+            <form id="quick-add-form" class="quick-add-card">
+              <div class="field-group">
+                <label for="new-menu-name">Item name</label>
+                <input id="new-menu-name" type="text" maxlength="80" placeholder="e.g. Veg sandwich" />
+              </div>
+              <div class="field-group">
+                <label for="new-menu-category">Type</label>
+                <select id="new-menu-category">
+                  <option value="snacks">Snacks</option>
+                  <option value="cook_to_order">Made on order</option>
+                  <option value="drinks">Drinks</option>
+                </select>
+              </div>
+              <div class="quick-add-actions">
+                <button type="submit" class="btn-primary btn-inline">OK</button>
+                <button type="button" class="btn-secondary btn-inline" id="quick-add-cancel">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="menu-list"></div>
+      </section>
+    </main>
+
+    <script type="module" src="js/admin-menu.js"></script>
+  </body>
+</html>

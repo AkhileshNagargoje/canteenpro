@@ -52,6 +52,17 @@ function openDashboard() {
   }
 }
 
+async function runDashboardTask(task, fallbackMessage) {
+  try {
+    await task();
+    return true;
+  } catch (err) {
+    console.error(err);
+    alert(err?.message || fallbackMessage);
+    return false;
+  }
+}
+
 function initDashboard() {
   tearDownDashboard();
   const unsubs = [];
@@ -79,27 +90,6 @@ function initDashboard() {
     )
   );
 
-  const menuList = document.getElementById("menu-list");
-  unsubs.push(
-    onSnapshot(
-      query(collection(db, "menu"), orderBy("sortOrder", "asc")),
-      (snap) => {
-        menuList.innerHTML = "";
-        const items = snap.docs.map((x) => ({ id: x.id, ...x.data() }));
-        if (items.length === 0) {
-          menuList.innerHTML = '<p class="muted" style="margin:0">No menu items. Add one above.</p>';
-          return;
-        }
-        for (const item of items) {
-          menuList.appendChild(renderMenuRow(item));
-        }
-      },
-      () => {
-        menuList.innerHTML = '<p class="muted" style="margin:0">Could not load menu.</p>';
-      }
-    )
-  );
-
   const slotsListEl = document.getElementById("slots-list");
   unsubs.push(
     onSnapshot(
@@ -115,25 +105,12 @@ function initDashboard() {
           slotsListEl.appendChild(renderSlotRow(slot));
         }
       },
-      () => {
+      (err) => {
+        console.error(err);
         slotsListEl.innerHTML = '<p class="muted" style="margin:0">Could not load slots.</p>';
       }
     )
   );
-
-  const onMenu = async (e) => {
-    e.preventDefault();
-    const input = document.getElementById("new-menu-name");
-    const name = input.value.trim();
-    if (!name) return;
-    input.value = "";
-    await addDoc(collection(db, "menu"), {
-      name,
-      enabled: true,
-      sortOrder: Date.now(),
-      updatedAt: serverTimestamp(),
-    });
-  };
 
   const onSlot = async (e) => {
     e.preventDefault();
@@ -142,26 +119,31 @@ function initDashboard() {
     const label = labelInput.value.trim();
     const capacity = clampCapacity(capacityInput.value);
     if (!label) return;
-    labelInput.value = "";
-    capacityInput.value = String(DEFAULT_SLOT_CAPACITY);
-    await addDoc(collection(db, "slots"), {
-      label,
-      enabled: true,
-      capacity,
-      activeCount: 0,
-      sortOrder: Date.now(),
-      updatedAt: serverTimestamp(),
-    });
+
+    const ok = await runDashboardTask(
+      () =>
+        addDoc(collection(db, "slots"), {
+          label,
+          enabled: true,
+          capacity,
+          activeCount: 0,
+          sortOrder: Date.now(),
+          updatedAt: serverTimestamp(),
+        }),
+      "Could not add pickup slot."
+    );
+
+    if (ok) {
+      labelInput.value = "";
+      capacityInput.value = String(DEFAULT_SLOT_CAPACITY);
+    }
   };
 
-  const menuForm = document.getElementById("add-menu-form");
   const slotForm = document.getElementById("add-slot-form");
-  menuForm.addEventListener("submit", onMenu);
   slotForm.addEventListener("submit", onSlot);
 
   dashboardTeardown = () => {
     unsubs.forEach((u) => u());
-    menuForm.removeEventListener("submit", onMenu);
     slotForm.removeEventListener("submit", onSlot);
   };
 }
@@ -181,6 +163,8 @@ function initDashboard() {
 
   if (sessionStorage.getItem(SESSION_KEY) === "1") {
     openDashboard();
+  } else {
+    showPinScreen();
   }
 
   pinForm.addEventListener("submit", (e) => {
@@ -218,10 +202,10 @@ function renderOrderRow(id, order) {
   const title = document.createElement("div");
   title.innerHTML = `<strong>${esc(order.displayId || id)}</strong> <span class="badge ${badgeClass}">${esc(status)}</span>`;
 
-  const userTag = order.studentUsername ? ` | @${esc(order.studentUsername)}` : "";
   const meta = document.createElement("div");
   meta.className = "order-meta";
-  meta.innerHTML = `${esc(order.studentName || "-")}${userTag} | ${esc(order.menuItemName || "Item")} x ${Number(order.quantity || 0)} | ${esc(order.slotLabel || "")}`;
+  const displayName = order.studentUsername ? `@${order.studentUsername}` : order.studentName || "-";
+  meta.innerHTML = `${esc(displayName)} | ${esc(formatOrderItems(order))} | ${esc(order.slotLabel || "")}`;
 
   const actions = document.createElement("div");
   actions.className = "row-actions";
@@ -298,50 +282,6 @@ async function setStatus(id, status) {
   });
 }
 
-function renderMenuRow(item) {
-  const row = document.createElement("div");
-  row.className = "list-editor-item" + (item.enabled === false ? " pill-off" : "");
-
-  const nameInput = document.createElement("input");
-  nameInput.type = "text";
-  nameInput.value = item.name || "";
-  nameInput.addEventListener("change", async () => {
-    const name = nameInput.value.trim();
-    if (!name) {
-      nameInput.value = item.name || "";
-      return;
-    }
-    await updateMenu(item.id, { name, updatedAt: serverTimestamp() });
-  });
-
-  const toggle = document.createElement("button");
-  toggle.type = "button";
-  toggle.className = "btn-secondary btn-small";
-  toggle.textContent = item.enabled === false ? "Off" : "On";
-  toggle.addEventListener("click", async () => {
-    await updateMenu(item.id, {
-      enabled: item.enabled === false,
-      updatedAt: serverTimestamp(),
-    });
-  });
-
-  const del = document.createElement("button");
-  del.type = "button";
-  del.className = "btn-danger btn-small";
-  del.textContent = "Delete";
-  del.addEventListener("click", async () => {
-    if (confirm("Remove this menu item?")) await deleteDoc(doc(db, "menu", item.id));
-  });
-
-  row.appendChild(nameInput);
-  const grp = document.createElement("div");
-  grp.className = "row-actions";
-  grp.appendChild(toggle);
-  grp.appendChild(del);
-  row.appendChild(grp);
-  return row;
-}
-
 function renderSlotRow(slot) {
   const row = document.createElement("div");
   row.className = "list-editor-item" + (slot.enabled === false ? " pill-off" : "");
@@ -358,7 +298,11 @@ function renderSlotRow(slot) {
       labelInput.value = slot.label || "";
       return;
     }
-    await updateSlot(slot.id, { label, updatedAt: serverTimestamp() });
+    const ok = await runDashboardTask(
+      () => updateSlot(slot.id, { label, updatedAt: serverTimestamp() }),
+      "Could not update pickup slot label."
+    );
+    if (!ok) labelInput.value = slot.label || "";
   });
   left.appendChild(labelInput);
 
@@ -378,7 +322,11 @@ function renderSlotRow(slot) {
   capacityInput.addEventListener("change", async () => {
     const nextCapacity = clampCapacity(capacityInput.value, Math.max(1, activeCount));
     capacityInput.value = String(nextCapacity);
-    await updateSlot(slot.id, { capacity: nextCapacity, updatedAt: serverTimestamp() });
+    const ok = await runDashboardTask(
+      () => updateSlot(slot.id, { capacity: nextCapacity, updatedAt: serverTimestamp() }),
+      "Could not update slot capacity."
+    );
+    if (!ok) capacityInput.value = String(capacity);
   });
 
   const toggle = document.createElement("button");
@@ -386,10 +334,14 @@ function renderSlotRow(slot) {
   toggle.className = "btn-secondary btn-small";
   toggle.textContent = slot.enabled === false ? "Off" : "On";
   toggle.addEventListener("click", async () => {
-    await updateSlot(slot.id, {
-      enabled: slot.enabled === false,
-      updatedAt: serverTimestamp(),
-    });
+    await runDashboardTask(
+      () =>
+        updateSlot(slot.id, {
+          enabled: slot.enabled === false,
+          updatedAt: serverTimestamp(),
+        }),
+      "Could not update slot status."
+    );
   });
 
   const del = document.createElement("button");
@@ -401,7 +353,8 @@ function renderSlotRow(slot) {
       alert("This slot still has active orders. Finish or cancel them first.");
       return;
     }
-    if (confirm("Remove this pickup slot?")) await deleteDoc(doc(db, "slots", slot.id));
+    if (!confirm("Remove this pickup slot?")) return;
+    await runDashboardTask(() => deleteDoc(doc(db, "slots", slot.id)), "Could not remove pickup slot.");
   });
 
   row.appendChild(left);
@@ -430,8 +383,23 @@ function mkBtn(label, cls, onClick) {
   return button;
 }
 
-function esc(s) {
-  return String(s)
+function formatOrderItems(order) {
+  if (Array.isArray(order.items) && order.items.length > 0) {
+    return order.items
+      .map((item) => {
+        const name = item && typeof item.menuItemName === "string" ? item.menuItemName : "Item";
+        const quantity = Math.max(1, safeInt(item?.quantity, 1));
+        return `${name} x ${quantity}`;
+      })
+      .join(", ");
+  }
+
+  const fallbackName = typeof order.menuItemName === "string" ? order.menuItemName : "Item";
+  return `${fallbackName} x ${Math.max(1, safeInt(order.quantity, 1))}`;
+}
+
+function esc(value) {
+  return String(value)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/\"/g, "&quot;");
@@ -451,15 +419,6 @@ function canTransition(prevStatus, nextStatus) {
   if (prevStatus === "pending") return nextStatus === "ready" || nextStatus === "cancelled";
   if (prevStatus === "ready") return nextStatus === "collected" || nextStatus === "cancelled";
   return false;
-}
-
-async function updateMenu(id, patch) {
-  await runTransaction(db, async (tx) => {
-    const ref = doc(db, "menu", id);
-    const snap = await tx.get(ref);
-    if (!snap.exists()) throw new Error("Menu item not found.");
-    tx.set(ref, patch, { merge: true });
-  });
 }
 
 async function updateSlot(id, patch) {

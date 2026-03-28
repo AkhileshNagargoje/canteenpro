@@ -3,64 +3,93 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Canteen - Staff</title>
+    <title>Canteen Pro Staff</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/styles.css" />
   </head>
-  <body>
-    <main>
-      <div class="topbar">
-        <a href="index.html"><- Student order</a>
-        <button type="button" class="btn-secondary btn-small" id="lock-btn" hidden>Lock</button>
-      </div>
+  <body class="admin-page">
+    <main class="shell shell-admin">
+      <header class="shell-top app-bar">
+        <div class="brand-area brand-cluster">
+          <div class="brand-mark">CP</div>
+          <div>
+            <span class="brand-name">Canteen operations</span>
+            <h1>Canteen management</h1>
+          </div>
+        </div>
+        <div class="utility-area">
+          <a class="plain-link" href="index.html">Student</a>
+          <button type="button" class="btn-secondary btn-small" id="lock-btn" hidden>Lock</button>
+        </div>
+      </header>
 
-      <div id="pin-screen" class="card">
-        <h1 style="margin: 0 0 0.5rem; font-size: 1.15rem">Staff dashboard</h1>
-        <p class="muted" style="margin: 0 0 1rem">
-          Enter the PIN from <code style="font-size: 0.85em">js/config.js</code> (<code>adminPin</code>).
-        </p>
-        <form id="pin-form">
-          <label for="pin-input">PIN</label>
-          <input id="pin-input" type="password" autocomplete="off" required />
-          <p id="pin-error" class="muted" style="color: var(--danger); margin: 0.35rem 0 0; min-height: 1.2em"></p>
-          <button type="submit" class="btn-primary">Unlock</button>
+      <div id="pin-screen" class="panel panel-unlock panel-surface">
+        <div class="panel-head panel-head-clean">
+          <div>
+            <span class="section-tag">Trusted device</span>
+            <h2>Unlock dashboard</h2>
+          </div>
+          <p>Use the local admin PIN on a trusted staff device to manage orders, menu access, and pickup slots.</p>
+        </div>
+
+        <form id="pin-form" class="form-stack">
+          <div class="field-group">
+            <label for="pin-input">PIN</label>
+            <input id="pin-input" type="password" autocomplete="off" required />
+          </div>
+          <p id="pin-error" class="form-note form-error"></p>
+          <button type="submit" class="btn-primary">Unlock dashboard</button>
         </form>
       </div>
 
       <div id="dashboard" hidden>
-        <h1 style="margin: 0 0 0.25rem; font-size: 1.15rem">Orders</h1>
-        <p class="tagline" style="margin-bottom: 1rem">Live queue - newest first.</p>
-
-        <div id="orders-card" class="card">
-          <p id="orders-empty" class="muted" style="margin: 0">Loading...</p>
-          <div id="orders-list"></div>
-        </div>
-
-        <div class="card admin-section">
-          <h2>Menu</h2>
-          <form id="add-menu-form" class="row-actions" style="margin-bottom: 0.75rem; align-items: flex-end">
-            <div style="flex: 1; min-width: 140px">
-              <label for="new-menu-name">New item name</label>
-              <input id="new-menu-name" type="text" maxlength="80" placeholder="e.g. Veg thali" />
+        <div class="admin-dashboard-grid">
+          <section class="panel panel-surface panel-queue">
+            <div class="panel-head panel-head-clean compact-head">
+              <div>
+                <span class="section-tag">Live queue</span>
+                <h2>Orders</h2>
+              </div>
+              <p>Move the canteen queue quickly from pending to ready to collected.</p>
             </div>
-            <button type="submit" class="btn-secondary" style="margin-top: auto">Add</button>
-          </form>
-          <div id="menu-list"></div>
-        </div>
+            <p id="orders-empty" class="muted">Loading...</p>
+            <div id="orders-list"></div>
+          </section>
 
-        <div class="card admin-section">
-          <h2>Pickup slots</h2>
-          <form id="add-slot-form" class="row-actions" style="margin-bottom: 0.75rem; align-items: flex-end">
-            <div style="flex: 1; min-width: 140px">
-              <label for="new-slot-label">New slot label</label>
-              <input id="new-slot-label" type="text" maxlength="60" placeholder="e.g. 12:30-12:40" />
-            </div>
-            <div style="width: 110px">
-              <label for="new-slot-capacity">Capacity</label>
-              <input id="new-slot-capacity" type="number" min="1" max="500" value="25" />
-            </div>
-            <button type="submit" class="btn-secondary" style="margin-top: auto">Add</button>
-          </form>
-          <div id="slots-list"></div>
+          <aside class="admin-action-rail">
+            <a class="panel panel-surface admin-link-card" href="admin-menu.html">
+              <span class="section-tag">Menu studio</span>
+              <h2>Menu</h2>
+              <p>Open the full menu page to add, edit, and organise items.</p>
+              <span class="admin-link-action">Open menu</span>
+            </a>
+
+            <section class="panel panel-surface admin-link-card admin-slot-card">
+              <div class="panel-head panel-head-clean compact-head">
+                <div>
+                  <span class="section-tag">Pickup slots</span>
+                  <h2>Capacity</h2>
+                </div>
+                <p>Manage live pickup windows from the dashboard.</p>
+              </div>
+
+              <form id="add-slot-form" class="inline-form inline-form-slot">
+                <div class="field-group field-grow">
+                  <label for="new-slot-label">New slot label</label>
+                  <input id="new-slot-label" type="text" maxlength="60" placeholder="e.g. 12:30-12:40" />
+                </div>
+                <div class="field-group field-compact">
+                  <label for="new-slot-capacity">Capacity</label>
+                  <input id="new-slot-capacity" type="number" min="1" max="500" value="25" />
+                </div>
+                <button type="submit" class="btn-secondary inline-submit">Add slot</button>
+              </form>
+
+              <div id="slots-list"></div>
+            </section>
+          </aside>
         </div>
       </div>
     </main>
