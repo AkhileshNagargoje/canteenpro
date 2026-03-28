@@ -74,9 +74,22 @@ function parsePriceInput(value) {
 }
 
 function normalizeImagePath(value) {
-  const trimmed = String(value ?? "").trim().replace(/^\/+/, "");
+  const trimmed = String(value ?? "").trim();
   if (!trimmed) return "";
-  return trimmed;
+
+  const unquoted = trimmed.replace(/^['"]+|['"]+$/g, "");
+  const slashed = unquoted.replace(/\\+/g, "/").replace(/^\/+/, "");
+  if (!slashed) return "";
+
+  if (/^https?:\/\//i.test(slashed)) {
+    return slashed;
+  }
+
+  if (slashed.startsWith("images/")) {
+    return slashed;
+  }
+
+  return `images/${slashed}`;
 }
 
 function formatPrice(value) {
