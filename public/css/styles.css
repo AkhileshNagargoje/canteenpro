@@ -867,10 +867,14 @@ button {
 
 .draft-order-item {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
   padding: 14px;
+}
+
+.draft-order-item-compact {
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .order-item-thumb,

@@ -327,26 +327,26 @@ function renderDraftItems() {
   orderItemsEmptyEl.hidden = hasItems;
   orderItemsEl.innerHTML = hasItems
     ? orderItems
-        .map(
-          (item) => `
-            <article class="draft-order-item">
-              <div class="order-item-thumb">${cardImageMarkup(item)}</div>
+        .map((item) => {
+          const quantity = Math.max(1, safeInt(item.quantity, 1));
+          const linePrice = item.price == null ? "" : ` • ${escapeText(formatPrice(item.price * quantity))}`;
+          return `
+            <article class="draft-order-item draft-order-item-compact">
               <div class="order-item-copy">
                 <h4>${escapeText(item.menuItemName)}</h4>
-                <p class="order-item-meta">Qty ${Math.max(1, safeInt(item.quantity, 1))}${item.price == null ? "" : ` • ${escapeText(formatPrice(item.price))}`}</p>
+                <p class="order-item-meta">Qty ${quantity}${linePrice}</p>
               </div>
               <div class="basket-stepper">
                 <button type="button" class="menu-qty-btn" data-remove-one-id="${escapeAttr(item.menuItemId)}">-</button>
-                <span class="menu-qty-count">${Math.max(1, safeInt(item.quantity, 1))}</span>
+                <span class="menu-qty-count">${quantity}</span>
                 <button type="button" class="menu-qty-btn" data-add-one-id="${escapeAttr(item.menuItemId)}">+</button>
               </div>
             </article>
-          `
-        )
+          `;
+        })
         .join("")
     : "";
   orderTotalEl.textContent = draftTotalLabel();
-  attachImageFallbacks(orderItemsEl);
 }
 
 function updateCheckoutState() {
