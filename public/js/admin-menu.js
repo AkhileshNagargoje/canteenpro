@@ -228,15 +228,11 @@ function renderMenuRow(item) {
   });
   categoryInput.value = item.category;
 
-  const imageInput = document.createElement("input");
-  imageInput.type = "text";
-  imageInput.value = item.imageUrl;
-  imageInput.placeholder = "Image URL";
+  let pendingImageUrl = item.imageUrl;
 
   fields.appendChild(nameInput);
   fields.appendChild(priceInput);
   fields.appendChild(categoryInput);
-  fields.appendChild(imageInput);
 
   const fileInput = document.createElement("input");
   fileInput.type = "file";
@@ -276,7 +272,7 @@ function renderMenuRow(item) {
 
     const url = await runMenuValueTask(() => uploadMenuImage(item.id, file), "Could not upload image.");
     if (url) {
-      imageInput.value = url;
+      pendingImageUrl = url;
       renderPreview(url, nameInput.value.trim() || item.name);
       uploadStatus.textContent = `${file.name} uploaded. Click Apply to save.`;
     } else {
@@ -328,7 +324,7 @@ function renderMenuRow(item) {
           name,
           price,
           category: normalizeMenuCategory(categoryInput.value),
-          imageUrl: imageInput.value.trim(),
+          imageUrl: pendingImageUrl,
           updatedAt: serverTimestamp(),
         }),
       "Could not apply changes."
