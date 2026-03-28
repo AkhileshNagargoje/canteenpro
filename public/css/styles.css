@@ -523,7 +523,11 @@ button {
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 251, 255, 0.96));
 }
 
-.menu-panel {
+.menu-panel,
+.basket-panel,
+.panel-queue,
+.admin-link-card,
+.admin-slot-card {
   position: relative;
   overflow: hidden;
 }
@@ -535,9 +539,11 @@ button {
 .admin-slot-card::before {
   content: "";
   position: absolute;
-  inset: 0 auto auto 0;
-  width: 100%;
+  top: 0;
+  left: 24px;
+  right: 24px;
   height: 5px;
+  border-radius: 999px;
   background: linear-gradient(90deg, #f59e0b, #fb923c, #fbbf24);
   opacity: 0.9;
 }
@@ -1237,6 +1243,15 @@ button {
   .admin-slot-card,
   .modal-card {
     padding: 18px;
+  }
+
+  .menu-panel::before,
+  .basket-panel::before,
+  .panel-queue::before,
+  .admin-link-card::before,
+  .admin-slot-card::before {
+    left: 18px;
+    right: 18px;
   }
 
   .form-grid,
