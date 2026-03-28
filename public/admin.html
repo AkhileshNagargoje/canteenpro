@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Canteen - Staff</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <main>
+      <div class="topbar">
+        <a href="index.html"><- Student order</a>
+        <button type="button" class="btn-secondary btn-small" id="lock-btn" hidden>Lock</button>
+      </div>
+
+      <div id="pin-screen" class="card">
+        <h1 style="margin: 0 0 0.5rem; font-size: 1.15rem">Staff dashboard</h1>
+        <p class="muted" style="margin: 0 0 1rem">
+          Enter the PIN from <code style="font-size: 0.85em">js/config.js</code> (<code>adminPin</code>).
+        </p>
+        <form id="pin-form">
+          <label for="pin-input">PIN</label>
+          <input id="pin-input" type="password" autocomplete="off" required />
+          <p id="pin-error" class="muted" style="color: var(--danger); margin: 0.35rem 0 0; min-height: 1.2em"></p>
+          <button type="submit" class="btn-primary">Unlock</button>
+        </form>
+      </div>
+
+      <div id="dashboard" hidden>
+        <h1 style="margin: 0 0 0.25rem; font-size: 1.15rem">Orders</h1>
+        <p class="tagline" style="margin-bottom: 1rem">Live queue - newest first.</p>
+
+        <div id="orders-card" class="card">
+          <p id="orders-empty" class="muted" style="margin: 0">Loading...</p>
+          <div id="orders-list"></div>
+        </div>
+
+        <div class="card admin-section">
+          <h2>Menu</h2>
+          <form id="add-menu-form" class="row-actions" style="margin-bottom: 0.75rem; align-items: flex-end">
+            <div style="flex: 1; min-width: 140px">
+              <label for="new-menu-name">New item name</label>
+              <input id="new-menu-name" type="text" maxlength="80" placeholder="e.g. Veg thali" />
+            </div>
+            <button type="submit" class="btn-secondary" style="margin-top: auto">Add</button>
+          </form>
+          <div id="menu-list"></div>
+        </div>
+
+        <div class="card admin-section">
+          <h2>Pickup slots</h2>
+          <form id="add-slot-form" class="row-actions" style="margin-bottom: 0.75rem; align-items: flex-end">
+            <div style="flex: 1; min-width: 140px">
+              <label for="new-slot-label">New slot label</label>
+              <input id="new-slot-label" type="text" maxlength="60" placeholder="e.g. 12:30-12:40" />
+            </div>
+            <div style="width: 110px">
+              <label for="new-slot-capacity">Capacity</label>
+              <input id="new-slot-capacity" type="number" min="1" max="500" value="25" />
+            </div>
+            <button type="submit" class="btn-secondary" style="margin-top: auto">Add</button>
+          </form>
+          <div id="slots-list"></div>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="js/admin.js"></script>
+  </body>
+</html>

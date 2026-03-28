@@ -1,0 +1,136 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function validName(value, maxLen) {
+      return value is string && value.size() >= 1 && value.size() <= maxLen;
+    }
+
+    function validDocId(value) {
+      return value is string && value.size() >= 6 && value.size() <= 128;
+    }
+
+    function validUsername(username) {
+      return username.matches('^[a-z0-9_]{3,32}$');
+    }
+
+    function validStudentData() {
+      return request.resource.data.keys().hasOnly(['pin', 'createdAt', 'activeOrderId']) &&
+        request.resource.data.pin is string &&
+        request.resource.data.pin.size() >= 4 &&
+        request.resource.data.pin.size() <= 64 &&
+        request.resource.data.createdAt is timestamp &&
+        (
+          request.resource.data.activeOrderId == null ||
+          validDocId(request.resource.data.activeOrderId)
+        );
+    }
+
+    function validMenuData() {
+      return request.resource.data.keys().hasOnly(['name', 'enabled', 'sortOrder', 'updatedAt']) &&
+        validName(request.resource.data.name, 80) &&
+        request.resource.data.enabled is bool &&
+        request.resource.data.sortOrder is int &&
+        request.resource.data.updatedAt is timestamp;
+    }
+
+    function validSlotData() {
+      return request.resource.data.keys().hasOnly(['label', 'enabled', 'sortOrder', 'updatedAt', 'capacity', 'activeCount']) &&
+        validName(request.resource.data.label, 60) &&
+        request.resource.data.enabled is bool &&
+        request.resource.data.sortOrder is int &&
+        request.resource.data.updatedAt is timestamp &&
+        request.resource.data.capacity is int &&
+        request.resource.data.capacity >= 1 &&
+        request.resource.data.capacity <= 500 &&
+        request.resource.data.activeCount is int &&
+        request.resource.data.activeCount >= 0 &&
+        request.resource.data.activeCount <= request.resource.data.capacity;
+    }
+
+    function validOrderCreate(orderId) {
+      return request.resource.data.keys().hasOnly([
+          'displayId',
+          'studentUsername',
+          'studentName',
+          'menuItemId',
+          'menuItemName',
+          'quantity',
+          'slotId',
+          'slotLabel',
+          'status',
+          'createdAt'
+        ]) &&
+        validDocId(orderId) &&
+        request.resource.data.displayId is string &&
+        request.resource.data.displayId.matches('^#A[0-9]{3,}$') &&
+        validUsername(request.resource.data.studentUsername) &&
+        validName(request.resource.data.studentName, 80) &&
+        validDocId(request.resource.data.menuItemId) &&
+        validName(request.resource.data.menuItemName, 80) &&
+        validDocId(request.resource.data.slotId) &&
+        validName(request.resource.data.slotLabel, 60) &&
+        request.resource.data.quantity is int &&
+        request.resource.data.quantity >= 1 &&
+        request.resource.data.quantity <= 99 &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.createdAt is timestamp;
+    }
+
+    function validOrderUpdate() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'updatedAt']) &&
+        request.resource.data.updatedAt is timestamp &&
+        (
+          (resource.data.status == 'pending' && (request.resource.data.status == 'ready' || request.resource.data.status == 'cancelled')) ||
+          (resource.data.status == 'ready' && (request.resource.data.status == 'collected' || request.resource.data.status == 'cancelled'))
+        );
+    }
+
+    match /students/{username} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if validUsername(username) && validStudentData();
+      allow update: if validUsername(username) &&
+        validStudentData() &&
+        request.resource.data.pin == resource.data.pin &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly(['activeOrderId']);
+      allow delete: if false;
+    }
+
+    match /menu/{itemId} {
+      allow read: if true;
+      allow create, update: if validMenuData();
+      allow delete: if true;
+    }
+
+    match /slots/{slotId} {
+      allow read: if true;
+      allow create, update: if validSlotData();
+      allow delete: if true;
+    }
+
+    match /orders/{orderId} {
+      allow read: if true;
+      allow create: if validOrderCreate(orderId);
+      allow update: if validOrderUpdate();
+      allow delete: if false;
+    }
+
+    match /meta/counters {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.resource.data.keys().hasOnly(['orderSeq']) &&
+        request.resource.data.orderSeq is int &&
+        request.resource.data.orderSeq >= 100;
+      allow update: if request.resource.data.keys().hasOnly(['orderSeq']) &&
+        request.resource.data.orderSeq is int &&
+        resource.data.orderSeq is int &&
+        request.resource.data.orderSeq == resource.data.orderSeq + 1;
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

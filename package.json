@@ -1,0 +1,12 @@
+{
+  "name": "canteenpro",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy:rules": "firebase deploy --only firestore:rules",
+    "deploy:hosting": "firebase deploy --only hosting"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.0.0"
+  }
+}
