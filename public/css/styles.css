@@ -922,7 +922,8 @@ button {
 }
 
 .mobile-cart-fab,
-.mobile-cart-overlay {
+.mobile-cart-overlay,
+.mobile-toast {
   display: none;
 }
 
@@ -979,6 +980,14 @@ button {
   margin-top: 18px;
   padding-top: 24px;
   border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.checkout-stage-mobile {
+  position: sticky;
+  bottom: 0;
+  margin-top: 0;
+  padding: 16px 0 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), #ffffff 28%);
 }
 
 .summary-total {
@@ -1371,13 +1380,17 @@ button {
   .student-page .top-nav .btn-small,
   .admin-page .utility-area .btn-small,
   .student-page .top-nav .user-chip {
-    min-height: 30px;
-    padding: 6px 9px;
-    font-size: 0.76rem;
+    min-height: 28px;
+    padding: 5px 8px;
+    font-size: 0.72rem;
   }
 
   .student-page .top-nav .user-chip {
     display: none;
+  }
+
+  .student-page .top-nav a {
+    opacity: 0.82;
   }
 
   .student-page .top-nav,
@@ -1393,7 +1406,7 @@ button {
     top: auto;
     min-height: 0;
     max-height: calc(100vh - 96px);
-    overflow: auto;
+    overflow: hidden;
     z-index: 60;
     border-radius: 28px;
     transform: translateY(calc(100% + 24px));
@@ -1406,6 +1419,12 @@ button {
     -webkit-backdrop-filter: none;
   }
 
+  .basket-sheet-body {
+    overflow: auto;
+    max-height: calc(100vh - 260px);
+    padding: 2px 0 0;
+  }
+
   .basket-panel.mobile-cart-open {
     transform: translateY(0);
     opacity: 1;
@@ -1415,6 +1434,7 @@ button {
   .basket-panel-head {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
+    padding-bottom: 6px;
   }
 
   .basket-close {
@@ -1434,6 +1454,27 @@ button {
     display: none !important;
   }
 
+  .mobile-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 92px;
+    transform: translateX(-50%);
+    z-index: 70;
+    min-width: 0;
+    max-width: calc(100vw - 32px);
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(19, 29, 51, 0.94);
+    color: #fff;
+    font-size: 0.84rem;
+    font-weight: 700;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+  }
+
+  .mobile-toast-show {
+    display: block;
+  }
+
   .mobile-cart-fab {
     position: fixed;
     right: 14px;
@@ -1449,6 +1490,15 @@ button {
     background: linear-gradient(135deg, #ff2f7d, #ff005d);
     color: #fff;
     box-shadow: 0 14px 24px rgba(255, 0, 93, 0.22);
+    transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+  }
+
+  .mobile-cart-fab-disabled {
+    opacity: 0.88;
+  }
+
+  .mobile-cart-fab-bump {
+    transform: translateY(-2px) scale(1.03);
   }
 
   .mobile-cart-fab-icon {

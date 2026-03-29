@@ -50,6 +50,7 @@ const basketCloseBtn = document.getElementById("basket-close");
 const mobileCartFab = document.getElementById("mobile-cart-fab");
 const mobileCartCount = document.getElementById("mobile-cart-count");
 const mobileCartOverlay = document.getElementById("mobile-cart-overlay");
+const mobileToast = document.getElementById("mobile-toast");
 const orderUsernameEl = document.getElementById("order-username");
 const form = document.getElementById("order-form");
 const orderApp = document.getElementById("order-app");
@@ -79,6 +80,7 @@ let activeMenuSection = "snacks";
 let orderItems = [];
 let menuLoadFailed = false;
 let slotLoadFailed = false;
+let mobileToastTimer = null;
 
 function normalizeUsername(raw) {
   const u = String(raw)
@@ -181,7 +183,8 @@ function updateMobileCartUi() {
   if (!mobileCartFab || !mobileCartCount) return;
   const totalQuantity = draftTotalQuantity();
   mobileCartFab.hidden = totalQuantity === 0;
-  mobileCartCount.textContent = draftTotalLabel();
+  mobileCartCount.textContent = slotState.size === 0 ? `${draftTotalLabel()} • slots closed` : draftTotalLabel();
+  mobileCartFab.classList.toggle("mobile-cart-fab-disabled", slotState.size === 0);
   if (totalQuantity === 0) {
     closeMobileCart();
   }
@@ -194,6 +197,18 @@ function openMobileCart() {
     mobileCartOverlay.hidden = false;
   }
   document.body.classList.add("mobile-cart-active");
+}
+
+function showMobileToast(message) {
+  if (!mobileToast) return;
+  mobileToast.textContent = message;
+  mobileToast.hidden = false;
+  mobileToast.classList.add("mobile-toast-show");
+  if (mobileToastTimer) clearTimeout(mobileToastTimer);
+  mobileToastTimer = setTimeout(() => {
+    mobileToast.classList.remove("mobile-toast-show");
+    mobileToast.hidden = true;
+  }, 1400);
 }
 
 function closeMobileCart() {
@@ -442,6 +457,11 @@ function changeDraftItemQuantity(menuItemId, delta) {
   renderDraftItems();
   updateCheckoutState();
   updateSlotHelp();
+  if (delta > 0 && liveItem) {
+    showMobileToast(`${liveItem.name} added`);
+    mobileCartFab?.classList.add("mobile-cart-fab-bump");
+    setTimeout(() => mobileCartFab?.classList.remove("mobile-cart-fab-bump"), 220);
+  }
 }
 
 function reconcileDraftItems() {

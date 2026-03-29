@@ -108,12 +108,14 @@
                   <button type="button" class="btn-secondary btn-small basket-close" id="basket-close">Close</button>
                 </div>
 
-                <div class="draft-order">
-                  <div id="order-items-empty" class="draft-order-empty">No items added yet. Start by tapping a dish from the menu.</div>
-                  <div id="order-items" class="draft-order-list" aria-live="polite"></div>
+                <div class="basket-sheet-body">
+                  <div class="draft-order">
+                    <div id="order-items-empty" class="draft-order-empty">No items added yet. Start by tapping a dish from the menu.</div>
+                    <div id="order-items" class="draft-order-list" aria-live="polite"></div>
+                  </div>
                 </div>
 
-                <section class="checkout-stage">
+                <section class="checkout-stage checkout-stage-mobile">
                   <div class="form-grid order-stage-grid checkout-grid">
                     <div class="field-group field-grow">
                       <label for="slot">Pickup time</label>
@@ -135,12 +137,13 @@
             <button type="button" class="mobile-cart-fab" id="mobile-cart-fab" hidden>
               <span class="mobile-cart-fab-icon">🛒</span>
               <span class="mobile-cart-fab-copy">
-                <strong>Cart</strong>
+                <strong>Your order</strong>
                 <span id="mobile-cart-count">0 items</span>
               </span>
             </button>
 
             <div class="mobile-cart-overlay" id="mobile-cart-overlay" hidden></div>
+            <div class="mobile-toast" id="mobile-toast" hidden></div>
           </div>
         </div>
       </div>
