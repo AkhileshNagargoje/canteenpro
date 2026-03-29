@@ -1377,10 +1377,7 @@ button {
   }
 
   .student-page .top-nav .user-chip {
-    max-width: 82px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: none;
   }
 
   .student-page .top-nav,
@@ -1471,11 +1468,11 @@ button {
   }
 
   .mobile-cart-fab-copy strong {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
   }
 
   .mobile-cart-fab-copy span {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     opacity: 0.92;
   }
 
@@ -1526,23 +1523,64 @@ button {
 
   .menu-grid,
   .menu-grid-restaurant {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .menu-card {
     grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 20px;
   }
 
   .menu-card-media,
   .selection-media {
     width: 100%;
-    height: 210px;
+    height: 140px;
+    border-radius: 16px;
   }
 
   .menu-card-body {
     padding-top: 0;
+    gap: 8px;
+  }
+
+  .menu-card-topline {
+    gap: 10px;
+  }
+
+  .menu-card-body h3 {
+    font-size: 0.98rem;
+    line-height: 1.14;
   }
 
   .menu-card-copy {
     max-width: none;
+    font-size: 0.82rem;
+    line-height: 1.4;
   }
 
+  .menu-card-price {
+    font-size: 0.95rem;
+  }
+
+  .menu-add-btn,
+  .menu-qty-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 1.15rem;
+  }
+
+  .menu-card-stepper {
+    gap: 6px;
+    padding: 3px;
+  }
+
+  .menu-qty-count {
+    min-width: 20px;
+    font-size: 0.84rem;
+  }
   .field-compact {
     max-width: none;
   }
@@ -1577,6 +1615,55 @@ button {
     border-radius: 11px;
   }
 
+  .menu-grid,
+  .menu-grid-restaurant {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .menu-card {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 18px;
+  }
+
+  .menu-card-media {
+    width: 100%;
+    height: 116px;
+    border-radius: 14px;
+  }
+
+  .menu-card-body {
+    gap: 6px;
+  }
+
+  .menu-card-topline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .menu-card-body h3 {
+    font-size: 0.92rem;
+  }
+
+  .menu-card-price {
+    font-size: 0.9rem;
+  }
+
+  .menu-card-copy {
+    font-size: 0.76rem;
+    line-height: 1.32;
+  }
+
+  .menu-add-btn,
+  .menu-qty-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+
   .basket-panel {
     min-height: 0;
     left: 10px;
@@ -1592,17 +1679,8 @@ button {
     padding: 10px 14px;
   }
 
-  h1 {
-    font-size: 1.9rem;
-  }
-
   .order-id {
     font-size: 2.55rem;
-  }
-
-  .menu-card-topline {
-    flex-direction: column;
-    align-items: flex-start;
   }
 
   .order-row-top,
