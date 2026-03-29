@@ -320,7 +320,7 @@ p {
 .admin-action-rail,
 .admin-dashboard-grid {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .panel-head {
@@ -356,7 +356,7 @@ p {
 }
 
 .student-stack {
-  gap: 22px;
+  gap: 18px;
 }
 
 .tabs {
@@ -526,7 +526,7 @@ button {
 .admin-slot-card,
 .panel-unlock {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 251, 255, 0.96));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.985), rgba(251, 252, 255, 0.97));
 }
 
 .menu-panel,
@@ -590,6 +590,7 @@ button {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
+  margin-bottom: -2px;
 }
 
 .menu-tag {
@@ -612,12 +613,12 @@ button {
 }
 
 .menu-section-note {
-  margin-top: -2px;
-  padding: 10px 14px;
-  border-radius: 14px;
-  background: var(--accent-soft-2);
+  margin-top: -4px;
+  padding: 4px 2px 0;
+  border-radius: 0;
+  background: transparent;
   color: #8a570b;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 600;
 }
 
