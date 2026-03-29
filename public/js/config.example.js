@@ -8,4 +8,4 @@ export const firebaseConfig = {
   measurementId: "G-XXXXXXXXXX",
 };
 
-export const adminPin = "1234";
+export const adminPin = "CHANGE_ME";
