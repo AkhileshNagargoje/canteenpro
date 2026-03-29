@@ -40,7 +40,6 @@ const menuEmptyEl = document.getElementById("menu-empty");
 const menuSectionTabs = document.getElementById("menu-section-tabs");
 const menuSectionNoteEl = document.getElementById("menu-section-note");
 const slotBlockerEl = document.getElementById("slot-blocker");
-const activeOrderBannerEl = document.getElementById("active-order-banner");
 const selectionStage = document.getElementById("selection-stage");
 const slotSel = document.getElementById("slot");
 const slotHelpEl = document.getElementById("slot-help");
@@ -76,7 +75,6 @@ let activeMenuSection = "snacks";
 let orderItems = [];
 let menuLoadFailed = false;
 let slotLoadFailed = false;
-let activeStudentOrder = null;
 
 function normalizeUsername(raw) {
   const u = String(raw)
@@ -234,11 +232,6 @@ function updateSlotHelp() {
     }
   }
 
-  if (activeStudentOrder) {
-    slotHelpEl.textContent = `You already have an active order (${activeStudentOrder.displayId || "pending"}). Wait for staff to complete it before placing another one.`;
-    return;
-  }
-
   if (orderItems.length === 0) {
     slotHelpEl.textContent = slotState.size === 0 ? "Pickup times will unlock after staff open slots." : "Add at least one item to unlock pickup time.";
     return;
@@ -371,10 +364,9 @@ function renderDraftItems() {
 
 function updateCheckoutState() {
   const hasItems = orderItems.length > 0;
-  const blockedByActiveOrder = Boolean(activeStudentOrder);
-  slotSel.disabled = !hasItems || slotLoadFailed || blockedByActiveOrder;
-  submitBtn.disabled = !hasItems || slotLoadFailed || menuLoadFailed || blockedByActiveOrder || slotState.size === 0;
-  if ((!hasItems || slotLoadFailed || blockedByActiveOrder) && slotSel.value) {
+  slotSel.disabled = !hasItems || slotLoadFailed;
+  submitBtn.disabled = !hasItems || slotLoadFailed || menuLoadFailed || slotState.size === 0;
+  if ((!hasItems || slotLoadFailed) && slotSel.value) {
     slotSel.value = "";
   }
   orderTotalEl.textContent = draftTotalLabel();
@@ -538,70 +530,6 @@ function startOrderListeners() {
     )
   );
 
-  const user = currentStudentUsername();
-  if (user) {
-    unsubs.push(
-      onSnapshot(
-        doc(db, "students", user),
-        (snap) => {
-          const data = snap.exists() ? snap.data() || {} : {};
-          const activeOrderId = typeof data.activeOrderId === "string" ? data.activeOrderId : "";
-          if (!activeOrderId) {
-            activeStudentOrder = null;
-            if (activeOrderBannerEl) {
-              activeOrderBannerEl.hidden = true;
-              activeOrderBannerEl.textContent = "";
-            }
-            updateCheckoutState();
-            updateSlotHelp();
-            return;
-          }
-
-          activeStudentOrder = {
-            id: activeOrderId,
-            displayId: activeOrderId,
-          };
-          if (activeOrderBannerEl) {
-            activeOrderBannerEl.hidden = false;
-            activeOrderBannerEl.textContent = "You already have one active order in progress. Finish or collect it before placing another order.";
-          }
-          updateCheckoutState();
-          updateSlotHelp();
-        },
-        (err) => {
-          console.error(err);
-        }
-      )
-    );
-
-    unsubs.push(
-      onSnapshot(
-        collection(db, "orders"),
-        (snap) => {
-          if (!activeStudentOrder?.id) return;
-          const match = snap.docs.find((entry) => entry.id === activeStudentOrder.id);
-          if (!match) return;
-          const data = match.data() || {};
-          activeStudentOrder = {
-            id: match.id,
-            displayId: data.displayId || match.id,
-            status: data.status || "pending",
-          };
-          if (activeOrderBannerEl) {
-            activeOrderBannerEl.hidden = false;
-            activeOrderBannerEl.textContent = `Active order ${activeStudentOrder.displayId}: ${activeStudentOrder.status}. You cannot place another order yet.`;
-          }
-          showConfirmationPanel(activeStudentOrder.displayId, activeStudentOrder.status);
-          updateCheckoutState();
-          updateSlotHelp();
-        },
-        (err) => {
-          console.error(err);
-        }
-      )
-    );
-  }
-
   orderUnsubs = unsubs;
 }
 
@@ -638,10 +566,6 @@ function showOrderChrome() {
   studentSignOut.hidden = false;
   studentLabel.textContent = user ? `@${user}` : "";
   orderUsernameEl.textContent = user ? `@${user}` : "@student";
-  if (activeOrderBannerEl) {
-    activeOrderBannerEl.hidden = true;
-    activeOrderBannerEl.textContent = "";
-  }
   startOrderListeners();
   showFormPanel();
 }
@@ -659,11 +583,6 @@ function showAuthChrome() {
   menuState = new Map();
   activeMenuSection = "snacks";
   orderItems = [];
-  activeStudentOrder = null;
-  if (activeOrderBannerEl) {
-    activeOrderBannerEl.hidden = true;
-    activeOrderBannerEl.textContent = "";
-  }
   slotSel.innerHTML = '<option value="">Loading slots...</option>';
   menuGrid.innerHTML = "";
   menuEmptyEl.hidden = true;
@@ -816,9 +735,6 @@ form.addEventListener("submit", async (e) => {
       if (!studentSnap.exists()) {
         throw new Error("Please sign in again before placing an order.");
       }
-      if (studentSnap.data()?.activeOrderId) {
-        throw new Error("You already have an active order. Wait for staff to complete it before placing another one.");
-      }
       if (!slotSnap.exists()) {
         throw new Error("That pickup slot no longer exists. Refresh and try again.");
       }
@@ -875,7 +791,6 @@ form.addEventListener("submit", async (e) => {
         status: "pending",
         createdAt: serverTimestamp(),
       });
-      tx.set(studentRef, { activeOrderId: orderRef.id }, { merge: true });
     });
 
     saveLastOrder(orderRef.id, studentUsername);
