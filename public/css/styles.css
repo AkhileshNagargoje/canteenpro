@@ -98,6 +98,16 @@ summary {
   transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease, opacity 180ms ease;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 button,
 input,
 select {
@@ -692,6 +702,17 @@ button {
   box-shadow: 0 18px 34px rgba(15, 23, 42, 0.09);
 }
 
+.menu-card,
+.mobile-cart-fab,
+.basket-panel,
+.order-ticket,
+.menu-add-btn,
+.menu-qty-btn,
+.btn-primary,
+.btn-secondary {
+  will-change: transform;
+}
+
 .menu-card-direct.is-unavailable {
   opacity: 0.72;
 }
@@ -794,6 +815,19 @@ button {
   color: #fff;
   background: linear-gradient(135deg, #f59e0b, #fb923c);
   box-shadow: 0 10px 20px rgba(245, 158, 11, 0.22);
+}
+
+.menu-add-btn:hover,
+.menu-qty-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.menu-add-btn:active,
+.menu-qty-btn:active,
+.mobile-cart-fab:active,
+.btn-primary:active,
+.btn-secondary:active {
+  transform: scale(0.98);
 }
 
 .menu-card-stepper,
@@ -951,6 +985,12 @@ button {
   gap: 12px;
   align-items: center;
   padding: 14px;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.draft-order-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(15, 23, 42, 0.08);
 }
 
 .draft-order-item-compact {
@@ -1539,6 +1579,18 @@ button {
 
   .mobile-toast-show {
     display: block;
+    animation: mobileToastIn 180ms ease;
+  }
+
+  @keyframes mobileToastIn {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   }
 
   .mobile-cart-fab {
@@ -1564,7 +1616,8 @@ button {
   }
 
   .mobile-cart-fab-bump {
-    transform: translateY(-2px) scale(1.03);
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 18px 30px rgba(255, 0, 93, 0.28);
   }
 
   .mobile-cart-fab-icon {

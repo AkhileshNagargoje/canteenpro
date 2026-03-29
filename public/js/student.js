@@ -197,6 +197,7 @@ function openMobileCart() {
     mobileCartOverlay.hidden = false;
   }
   document.body.classList.add("mobile-cart-active");
+  basketPanel.scrollTop = 0;
 }
 
 function showMobileToast(message) {
@@ -459,8 +460,11 @@ function changeDraftItemQuantity(menuItemId, delta) {
   updateSlotHelp();
   if (delta > 0 && liveItem) {
     showMobileToast(`${liveItem.name} added`);
-    mobileCartFab?.classList.add("mobile-cart-fab-bump");
-    setTimeout(() => mobileCartFab?.classList.remove("mobile-cart-fab-bump"), 220);
+    mobileCartFab?.classList.remove("mobile-cart-fab-bump");
+    requestAnimationFrame(() => {
+      mobileCartFab?.classList.add("mobile-cart-fab-bump");
+      setTimeout(() => mobileCartFab?.classList.remove("mobile-cart-fab-bump"), 240);
+    });
   }
 }
 
