@@ -99,13 +99,13 @@
                 <p id="active-order-note" class="muted">You can place another order anytime.</p>
               </div>
 
-              <section class="panel panel-side panel-surface basket-panel">
-                <div class="panel-head panel-head-clean compact-head">
+              <section class="panel panel-side panel-surface basket-panel" id="basket-panel">
+                <div class="panel-head panel-head-clean compact-head basket-panel-head">
                   <div>
                     <span class="section-tag">Your basket</span>
                     <h2>Current order</h2>
                   </div>
-                  <p>Review items, choose a pickup slot, and place the order.</p>
+                  <button type="button" class="btn-secondary btn-small basket-close" id="basket-close">Close</button>
                 </div>
 
                 <div class="draft-order">
@@ -131,6 +131,16 @@
                 </section>
               </section>
             </aside>
+
+            <button type="button" class="mobile-cart-fab" id="mobile-cart-fab" hidden>
+              <span class="mobile-cart-fab-icon">🛒</span>
+              <span class="mobile-cart-fab-copy">
+                <strong>Cart</strong>
+                <span id="mobile-cart-count">0 items</span>
+              </span>
+            </button>
+
+            <div class="mobile-cart-overlay" id="mobile-cart-overlay" hidden></div>
           </div>
         </div>
       </div>

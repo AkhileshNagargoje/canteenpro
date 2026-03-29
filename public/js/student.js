@@ -45,6 +45,11 @@ const slotHelpEl = document.getElementById("slot-help");
 const orderItemsEl = document.getElementById("order-items");
 const orderItemsEmptyEl = document.getElementById("order-items-empty");
 const orderTotalEl = document.getElementById("order-total");
+const basketPanel = document.getElementById("basket-panel");
+const basketCloseBtn = document.getElementById("basket-close");
+const mobileCartFab = document.getElementById("mobile-cart-fab");
+const mobileCartCount = document.getElementById("mobile-cart-count");
+const mobileCartOverlay = document.getElementById("mobile-cart-overlay");
 const orderUsernameEl = document.getElementById("order-username");
 const form = document.getElementById("order-form");
 const orderApp = document.getElementById("order-app");
@@ -170,6 +175,27 @@ function draftTotalLabel() {
   return hasFullPricing
     ? `${totalQuantity} ${itemWord} • ${formatPrice(draftTotalPrice())}`
     : `${totalQuantity} ${itemWord}`;
+}
+
+function updateMobileCartUi() {
+  if (!mobileCartFab || !mobileCartCount) return;
+  const totalQuantity = draftTotalQuantity();
+  mobileCartFab.hidden = totalQuantity === 0;
+  mobileCartCount.textContent = draftTotalLabel();
+}
+
+function openMobileCart() {
+  if (!basketPanel) return;
+  basketPanel.classList.add("mobile-cart-open");
+  mobileCartOverlay?.removeAttribute("hidden");
+  document.body.classList.add("mobile-cart-active");
+}
+
+function closeMobileCart() {
+  if (!basketPanel) return;
+  basketPanel.classList.remove("mobile-cart-open");
+  mobileCartOverlay?.setAttribute("hidden", "hidden");
+  document.body.classList.remove("mobile-cart-active");
 }
 
 function showConfigError(msg) {
@@ -354,6 +380,7 @@ function renderDraftItems() {
         .join("")
     : "";
   orderTotalEl.textContent = draftTotalLabel();
+  updateMobileCartUi();
 }
 
 function updateCheckoutState() {
@@ -629,6 +656,15 @@ orderItemsEl.addEventListener("click", (e) => {
   if (removeOneBtn) {
     changeDraftItemQuantity(removeOneBtn.dataset.removeOneId || "", -1);
   }
+});
+mobileCartFab?.addEventListener("click", () => {
+  openMobileCart();
+});
+basketCloseBtn?.addEventListener("click", () => {
+  closeMobileCart();
+});
+mobileCartOverlay?.addEventListener("click", () => {
+  closeMobileCart();
 });
 
 authForm.addEventListener("submit", async (e) => {
