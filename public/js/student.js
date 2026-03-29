@@ -182,19 +182,26 @@ function updateMobileCartUi() {
   const totalQuantity = draftTotalQuantity();
   mobileCartFab.hidden = totalQuantity === 0;
   mobileCartCount.textContent = draftTotalLabel();
+  if (totalQuantity === 0) {
+    closeMobileCart();
+  }
 }
 
 function openMobileCart() {
   if (!basketPanel) return;
   basketPanel.classList.add("mobile-cart-open");
-  mobileCartOverlay?.removeAttribute("hidden");
+  if (mobileCartOverlay) {
+    mobileCartOverlay.hidden = false;
+  }
   document.body.classList.add("mobile-cart-active");
 }
 
 function closeMobileCart() {
   if (!basketPanel) return;
   basketPanel.classList.remove("mobile-cart-open");
-  mobileCartOverlay?.setAttribute("hidden", "hidden");
+  if (mobileCartOverlay) {
+    mobileCartOverlay.hidden = true;
+  }
   document.body.classList.remove("mobile-cart-active");
 }
 
@@ -611,6 +618,7 @@ function showAuthChrome() {
     selectionStage.hidden = true;
   }
   hideConfirmationPanel();
+  closeMobileCart();
   renderMenuSectionTabs();
   updateMenuSectionNote();
   renderDraftItems();
@@ -861,6 +869,7 @@ function escapeText(s) {
   }
 
   hideConfirmationPanel();
+  closeMobileCart();
   if (selectionStage) {
     selectionStage.hidden = true;
   }
