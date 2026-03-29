@@ -10,7 +10,7 @@ Small **student ordering** app + **staff dashboard** with **Firestore** only. **
 ## Setup
 
 1. Firebase project → **Firestore** (create database). **Enable** Analytics only if you want it (optional).
-2. Web app config → paste into [`public/js/config.js`](public/js/config.js). Change **`adminPin`**.
+2. Copy [`public/js/config.example.js`](public/js/config.example.js) to `public/js/config.js`, then paste your Firebase web app config and set a private **`adminPin`**.
 3. Deploy rules (optional with open rules; still keeps console unblocked):
 
    ```bash

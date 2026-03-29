@@ -2,3 +2,4 @@
 *.local
 serviceAccountKey.json
 node_modules/
+public/js/config.js
