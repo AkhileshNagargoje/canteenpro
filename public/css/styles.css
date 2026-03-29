@@ -516,7 +516,8 @@ button {
 
 .student-app-grid {
   align-items: start;
-  margin-top: 8px;
+  margin-top: 14px;
+  gap: 20px;
 }
 
 .menu-panel,
@@ -557,7 +558,8 @@ button {
 .menu-panel-head {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
-  padding-top: 10px;
+  padding-top: 14px;
+  margin-bottom: 4px;
 }
 
 .identity-banner {
@@ -820,7 +822,7 @@ button {
 }
 
 .order-stage-grid {
-  margin-top: 16px;
+  margin-top: 6px;
 }
 
 .quick-add-grid,
@@ -831,7 +833,7 @@ button {
 
 .student-sidebar {
   display: grid;
-  gap: 18px;
+  gap: 20px;
   align-content: start;
 }
 
@@ -875,12 +877,14 @@ button {
 
 .basket-panel {
   position: sticky;
-  top: 108px;
+  top: 120px;
+  min-height: 610px;
 }
 
 .draft-order {
   display: grid;
-  gap: 12px;
+  gap: 14px;
+  margin-top: 4px;
 }
 
 .draft-order-empty {
@@ -926,18 +930,18 @@ button {
 
 .checkout-stage {
   display: grid;
-  gap: 16px;
-  margin-top: 8px;
-  padding-top: 18px;
+  gap: 18px;
+  margin-top: 18px;
+  padding-top: 24px;
   border-top: 1px solid rgba(148, 163, 184, 0.18);
 }
 
 .summary-total {
-  min-height: 52px;
+  min-height: 64px;
   display: flex;
   align-items: center;
-  padding: 0 14px;
-  border-radius: 14px;
+  padding: 0 16px;
+  border-radius: 16px;
   border: 1px solid rgba(148, 163, 184, 0.2);
   background: #fff;
   font-weight: 800;
@@ -1220,7 +1224,7 @@ button {
 @media (min-width: 980px) {
   .student-app-grid,
   .admin-dashboard-grid {
-    grid-template-columns: minmax(0, 1.4fr) 360px;
+    grid-template-columns: minmax(0, 1.45fr) 450px;
   }
 }
 
@@ -1233,12 +1237,17 @@ button {
 
   .basket-panel {
     position: static;
+    min-height: 0;
   }
 }
 
 @media (max-width: 760px) {
   .shell {
     width: min(100% - 16px, 1280px);
+  }
+
+  .student-app-grid {
+    gap: 16px;
   }
 
   .app-bar,
@@ -1319,6 +1328,10 @@ button {
 @media (max-width: 520px) {
   .app-bar {
     margin-top: 8px;
+  }
+
+  .basket-panel {
+    min-height: 0;
   }
 
   h1 {
