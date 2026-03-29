@@ -342,7 +342,6 @@ function renderMenuCards() {
   menuGrid.innerHTML = items
     .map((item) => {
       const price = item.price == null ? "" : `<p class="menu-card-price">${escapeText(formatPrice(item.price))}</p>`;
-      const sectionMeta = MENU_SECTIONS[item.category] || MENU_SECTIONS.snacks;
       return `
         <article class="menu-card menu-card-direct${item.available ? "" : " is-unavailable"}">
           <div class="menu-card-media">${cardImageMarkup(item)}</div>
@@ -352,7 +351,6 @@ function renderMenuCards() {
               <div class="menu-card-actions">${cardActionMarkup(item)}</div>
             </div>
             ${price}
-            <p class="menu-card-copy">${escapeText(sectionMeta.detail)}</p>
           </div>
         </article>
       `;
