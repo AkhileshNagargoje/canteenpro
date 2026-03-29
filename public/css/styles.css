@@ -559,7 +559,7 @@ button {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   padding-top: 14px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .identity-banner {
@@ -594,7 +594,7 @@ button {
   align-items: center;
   gap: 10px;
   margin-top: 4px;
-  margin-bottom: 6px;
+  margin-bottom: 12px;
 }
 
 .menu-tag {
@@ -623,7 +623,7 @@ button {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
-  margin-top: 6px;
+  margin-top: 0;
 }
 
 .menu-empty {
