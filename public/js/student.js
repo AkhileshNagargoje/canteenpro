@@ -74,6 +74,7 @@ const activeOrderNote = document.getElementById("active-order-note");
 
 let authMode = "login";
 let orderUnsubs = null;
+let lastOrderUnsub = null;
 let slotState = new Map();
 let menuState = new Map();
 let activeMenuSection = "snacks";
@@ -112,6 +113,18 @@ function saveLastOrder(docId, forUser) {
 
 function clearLastOrder() {
   localStorage.removeItem(LAST_ORDER_KEY);
+}
+
+function readLastOrder() {
+  try {
+    const raw = localStorage.getItem(LAST_ORDER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed.id !== "string") return null;
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
 function safeInt(value, fallback = 0) {
@@ -248,6 +261,10 @@ function tearDownOrderListeners() {
     orderUnsubs.forEach((unsub) => unsub());
     orderUnsubs = null;
   }
+  if (lastOrderUnsub) {
+    lastOrderUnsub();
+    lastOrderUnsub = null;
+  }
 }
 
 function setOrderHelp(msg) {
@@ -256,8 +273,15 @@ function setOrderHelp(msg) {
 
 function showConfirmationPanel(displayId, status) {
   confirmIdEl.textContent = displayId || "-";
-  confirmStatusEl.textContent =
-    status === "ready" ? "Latest order: Ready - come to the counter." : "Latest order: Waiting for the kitchen.";
+  if (status === "ready") {
+    confirmStatusEl.textContent = "Latest order: Ready - come to the counter.";
+  } else if (status === "collected") {
+    confirmStatusEl.textContent = "Latest order: Collected.";
+  } else if (status === "cancelled") {
+    confirmStatusEl.textContent = "Latest order: Cancelled.";
+  } else {
+    confirmStatusEl.textContent = "Latest order: Waiting for the kitchen.";
+  }
   confirmEl.hidden = false;
   activeOrderNote.hidden = false;
   activeOrderNote.textContent = "Track your current order here before placing another one.";
@@ -514,6 +538,8 @@ function startOrderListeners() {
   tearDownOrderListeners();
   const unsubs = [];
 
+  restoreLastOrderForCurrentUser();
+
   unsubs.push(
     onSnapshot(
       collection(db, "menu"),
@@ -581,6 +607,41 @@ function startOrderListeners() {
   );
 
   orderUnsubs = unsubs;
+}
+
+function restoreLastOrderForCurrentUser() {
+  const studentUsername = currentStudentUsername();
+  const saved = readLastOrder();
+  if (!studentUsername || !saved || saved.forUser !== studentUsername) return;
+
+  if (lastOrderUnsub) {
+    lastOrderUnsub();
+    lastOrderUnsub = null;
+  }
+
+  lastOrderUnsub = onSnapshot(
+    doc(db, "orders", saved.id),
+    (snap) => {
+      if (!snap.exists()) {
+        clearLastOrder();
+        hideConfirmationPanel();
+        return;
+      }
+
+      const data = snap.data() || {};
+      const status = data.status || "pending";
+      if (status === "cancelled" || status === "collected") {
+        clearLastOrder();
+        hideConfirmationPanel();
+        return;
+      }
+
+      showConfirmationPanel(data.displayId || saved.id, status);
+    },
+    (err) => {
+      console.error(err);
+    }
+  );
 }
 
 function showFormPanel() {
@@ -854,6 +915,7 @@ form.addEventListener("submit", async (e) => {
     });
 
     saveLastOrder(orderRef.id, studentUsername);
+    restoreLastOrderForCurrentUser();
     resetComposerUi();
     setOrderHelp("");
     showFormPanel();
