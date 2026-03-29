@@ -552,6 +552,11 @@ button {
     linear-gradient(180deg, rgba(255, 255, 255, 0.985), rgba(251, 252, 255, 0.97));
 }
 
+#pin-screen,
+#dashboard {
+  margin-top: 22px;
+}
+
 .menu-panel,
 .basket-panel,
 .panel-queue,
@@ -1289,6 +1294,11 @@ button {
     grid-template-columns: 1fr;
   }
 
+  #pin-screen,
+  #dashboard {
+    margin-top: 18px;
+  }
+
   .student-page .shell-top,
   .admin-page .shell-top {
     position: static;
@@ -1349,6 +1359,11 @@ button {
 @media (max-width: 760px) {
   .shell {
     width: min(100% - 16px, 1280px);
+  }
+
+  #pin-screen,
+  #dashboard {
+    margin-top: 16px;
   }
 
   .student-app-grid {
@@ -1695,6 +1710,11 @@ button {
 @media (max-width: 520px) {
   .app-bar {
     margin-top: 8px;
+  }
+
+  #pin-screen,
+  #dashboard {
+    margin-top: 14px;
   }
 
   .student-page .app-bar,
