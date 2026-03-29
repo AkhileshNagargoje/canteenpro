@@ -301,7 +301,7 @@ p {
 .panel-slip,
 .admin-link-card,
 .admin-slot-card {
-  padding: 24px;
+  padding: 26px 24px 24px;
 }
 
 .panel-head,
@@ -324,7 +324,7 @@ p {
 }
 
 .panel-head {
-  gap: 8px;
+  gap: 10px;
 }
 
 .panel-head-clean {
@@ -557,6 +557,7 @@ button {
 .menu-panel-head {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
+  padding-top: 10px;
 }
 
 .identity-banner {
@@ -590,7 +591,8 @@ button {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin-bottom: -2px;
+  margin-top: 4px;
+  margin-bottom: 6px;
 }
 
 .menu-tag {
@@ -613,13 +615,14 @@ button {
 }
 
 .menu-section-note {
-  margin-top: -4px;
-  padding: 4px 2px 0;
+  margin-top: 0;
+  padding: 2px 2px 8px;
   border-radius: 0;
   background: transparent;
   color: #8a570b;
   font-size: 0.9rem;
   font-weight: 600;
+  line-height: 1.5;
 }
 
 .menu-grid,
@@ -627,6 +630,7 @@ button {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+  margin-top: 6px;
 }
 
 .menu-empty {
