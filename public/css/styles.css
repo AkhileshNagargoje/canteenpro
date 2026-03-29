@@ -645,10 +645,10 @@ button {
 
 .menu-card {
   display: grid;
-  grid-template-columns: 104px minmax(0, 1fr);
-  gap: 16px;
-  align-items: center;
-  padding: 14px;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  padding: 16px;
 }
 
 .menu-card:hover {
@@ -671,8 +671,8 @@ button {
 }
 
 .menu-card-media {
-  width: 104px;
-  height: 104px;
+  width: 112px;
+  height: 112px;
 }
 
 .menu-card-media img,
@@ -699,14 +699,15 @@ button {
 .menu-card-body {
   overflow-x: hidden;
   display: grid;
-  gap: 6px;
+  gap: 10px;
+  padding-top: 2px;
 }
 
 .menu-card-topline {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
 }
 
 .menu-card-body h3,
@@ -720,11 +721,14 @@ button {
 .menu-card-price {
   color: var(--accent-strong);
   font-weight: 800;
+  margin-top: -2px;
 }
 
 .menu-card-copy {
   color: var(--muted);
   font-size: 0.9rem;
+  line-height: 1.55;
+  max-width: 26ch;
 }
 
 .menu-card-copy-strong {
@@ -734,6 +738,7 @@ button {
 
 .menu-card-actions {
   flex-shrink: 0;
+  padding-top: 2px;
 }
 
 .menu-add-btn,
@@ -1313,6 +1318,14 @@ button {
   .selection-media {
     width: 100%;
     height: 210px;
+  }
+
+  .menu-card-body {
+    padding-top: 0;
+  }
+
+  .menu-card-copy {
+    max-width: none;
   }
 
   .field-compact {
