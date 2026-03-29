@@ -38,7 +38,6 @@ const MENU_SECTIONS = {
 const menuGrid = document.getElementById("menu-grid");
 const menuEmptyEl = document.getElementById("menu-empty");
 const menuSectionTabs = document.getElementById("menu-section-tabs");
-const menuSectionNoteEl = document.getElementById("menu-section-note");
 const slotBlockerEl = document.getElementById("slot-blocker");
 const selectionStage = document.getElementById("selection-stage");
 const slotSel = document.getElementById("slot");
@@ -271,12 +270,7 @@ function renderMenuSectionTabs() {
   });
 }
 
-function updateMenuSectionNote() {
-  if (!menuSectionNoteEl) return;
-  const meta = currentMenuSectionMeta();
-  menuSectionNoteEl.textContent = meta.note;
-  menuSectionNoteEl.classList.toggle("menu-card-copy-strong", activeMenuSection === "cook_to_order");
-}
+function updateMenuSectionNote() {}
 
 function itemsForActiveSection() {
   return [...menuState.values()]
