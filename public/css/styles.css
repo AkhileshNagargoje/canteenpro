@@ -1313,53 +1313,73 @@ button {
 
   .student-page .app-bar,
   .admin-page .app-bar {
-    padding: 12px 14px 14px;
-    border-radius: 20px;
+    padding: 10px 12px;
+    border-radius: 18px;
     gap: 10px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .student-page .brand-mark,
   .admin-page .brand-mark {
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    font-size: 0.9rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    font-size: 0.82rem;
+    box-shadow: 0 10px 18px rgba(245, 158, 11, 0.24);
   }
 
   .student-page .brand-cluster,
   .admin-page .brand-cluster {
     gap: 10px;
+    flex-direction: row;
+    align-items: center;
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .student-page .brand-name,
   .admin-page .brand-name {
-    font-size: 0.68rem;
-    letter-spacing: 0.11em;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
   }
 
   .student-page h1,
   .admin-page h1 {
-    font-size: 1.6rem;
-    line-height: 1;
+    font-size: 1.15rem;
+    line-height: 1.02;
   }
 
   .student-page .top-nav,
   .admin-page .utility-area {
-    width: 100%;
+    width: auto;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    justify-content: flex-end;
+    gap: 6px;
   }
 
   .student-page .top-nav a,
-  .admin-page .utility-area a {
-    padding: 7px 10px;
+  .admin-page .utility-area a,
+  .student-page .top-nav .btn-small,
+  .admin-page .utility-area .btn-small,
+  .student-page .top-nav .user-chip {
+    min-height: 30px;
+    padding: 6px 9px;
+    font-size: 0.76rem;
   }
 
-  .student-page .top-nav .btn-small,
-  .student-page .top-nav .user-chip,
-  .admin-page .utility-area .btn-small {
-    min-height: 32px;
+  .student-page .top-nav .user-chip {
+    max-width: 82px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .student-page .top-nav,
+  .admin-page .utility-area {
+    margin-left: auto;
   }
 
   .basket-panel {
@@ -1527,20 +1547,20 @@ button {
 
   .student-page .app-bar,
   .admin-page .app-bar {
-    padding: 10px 12px 12px;
+    padding: 9px 10px;
     gap: 8px;
   }
 
   .student-page h1,
   .admin-page h1 {
-    font-size: 1.4rem;
+    font-size: 1rem;
   }
 
   .student-page .brand-mark,
   .admin-page .brand-mark {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
   }
 
   .basket-panel {
