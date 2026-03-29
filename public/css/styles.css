@@ -1289,6 +1289,57 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .student-page .shell-top,
+  .admin-page .shell-top {
+    position: static;
+  }
+
+  .student-page .app-bar,
+  .admin-page .app-bar {
+    padding: 12px 16px;
+    border-radius: 20px;
+    gap: 12px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: #16233d;
+    box-shadow: 0 14px 26px rgba(15, 23, 42, 0.16);
+  }
+
+  .student-page .brand-mark,
+  .admin-page .brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    font-size: 0.88rem;
+  }
+
+  .student-page h1,
+  .admin-page h1 {
+    font-size: 1.35rem;
+    line-height: 1.02;
+  }
+
+  .student-page .brand-name,
+  .admin-page .brand-name {
+    font-size: 0.66rem;
+    letter-spacing: 0.11em;
+  }
+
+  .student-page .top-nav,
+  .admin-page .utility-area {
+    gap: 8px;
+  }
+
+  .student-page .top-nav a,
+  .admin-page .utility-area a,
+  .student-page .top-nav .btn-small,
+  .admin-page .utility-area .btn-small,
+  .student-page .top-nav .user-chip {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 0.76rem;
+  }
+
   .basket-panel {
     position: static;
     min-height: 0;
