@@ -199,13 +199,24 @@ function renderOrderRow(id, order) {
           ? "badge-cancelled"
           : "badge-pending";
 
+  const top = document.createElement("div");
+  top.className = "order-row-top";
+
   const title = document.createElement("div");
   title.innerHTML = `<strong>${esc(order.displayId || id)}</strong> <span class="badge ${badgeClass}">${esc(status)}</span>`;
+
+  const time = document.createElement("div");
+  time.className = "order-time";
+  time.textContent = formatOrderTime(order.createdAt);
+
+  top.appendChild(title);
+  top.appendChild(time);
 
   const meta = document.createElement("div");
   meta.className = "order-meta";
   const displayName = order.studentUsername ? `@${order.studentUsername}` : order.studentName || "-";
-  meta.innerHTML = `${esc(displayName)} | ${esc(formatOrderItems(order))} | ${esc(order.slotLabel || "")}`;
+  const totalQty = Math.max(1, safeInt(order.totalQuantity, 1));
+  meta.innerHTML = `${esc(displayName)} | ${esc(formatOrderItems(order))} | Qty ${esc(totalQty)} | ${esc(order.slotLabel || "")}`;
 
   const actions = document.createElement("div");
   actions.className = "row-actions";
@@ -218,7 +229,7 @@ function renderOrderRow(id, order) {
     actions.appendChild(mkBtn("Cancel", "btn-danger btn-small", () => setStatus(id, "cancelled")));
   }
 
-  wrap.appendChild(title);
+  wrap.appendChild(top);
   wrap.appendChild(meta);
   if (actions.childNodes.length) wrap.appendChild(actions);
   return wrap;
@@ -396,6 +407,17 @@ function formatOrderItems(order) {
 
   const fallbackName = typeof order.menuItemName === "string" ? order.menuItemName : "Item";
   return `${fallbackName} x ${Math.max(1, safeInt(order.quantity, 1))}`;
+}
+
+function formatOrderTime(value) {
+  const date = value?.toDate?.() instanceof Date ? value.toDate() : null;
+  if (!date) return "Time pending";
+  return new Intl.DateTimeFormat("en-IN", {
+    hour: "numeric",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "short",
+  }).format(date);
 }
 
 function esc(value) {

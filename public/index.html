@@ -21,10 +21,8 @@
         </div>
 
         <nav class="top-nav">
-          <a href="#menu-section">Home</a>
           <a href="#menu-section">Menu</a>
           <a href="#basket-section">Basket</a>
-          <a href="admin.html">Admin</a>
           <span id="student-label" class="user-chip"></span>
           <button type="button" class="btn-secondary btn-small" id="student-sign-out" hidden>Sign out</button>
         </nav>
@@ -36,9 +34,9 @@
           <div class="panel-head panel-head-clean">
             <div>
               <span class="section-tag">Student access</span>
-              <h2>Sign in to continue</h2>
+              <h2>Start your order</h2>
             </div>
-            <p>Use your username and PIN. New students can create an account below.</p>
+            <p>New here? Create an account in a few seconds. Returning students can sign in with username and PIN.</p>
           </div>
 
           <div class="tabs tabs-soft">
@@ -78,6 +76,9 @@
                 <button type="button" class="menu-tag" data-section="drinks">Drinks</button>
               </div>
 
+              <p id="menu-section-note" class="menu-section-note"></p>
+              <div id="slot-blocker" class="banner banner-warn" hidden></div>
+
               <section class="menu-browser">
                 <div id="menu-grid" class="menu-grid menu-grid-restaurant" aria-live="polite"></div>
                 <p id="menu-empty" class="muted menu-empty" hidden>No menu items available right now.</p>
@@ -113,6 +114,8 @@
                   <div id="order-items-empty" class="draft-order-empty">No items added yet. Start by tapping a dish from the menu.</div>
                   <div id="order-items" class="draft-order-list" aria-live="polite"></div>
                 </div>
+
+                <div id="active-order-banner" class="banner banner-warn" hidden></div>
 
                 <section class="checkout-stage">
                   <div class="form-grid order-stage-grid checkout-grid">

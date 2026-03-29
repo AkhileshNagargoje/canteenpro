@@ -33,6 +33,16 @@ service cloud.firestore {
         );
     }
 
+    function validStudentOrderPointerUpdate() {
+      return request.resource.data.keys().hasOnly(['pin', 'createdAt', 'activeOrderId']) &&
+        request.resource.data.pin == resource.data.pin &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        (
+          request.resource.data.activeOrderId == null ||
+          validDocId(request.resource.data.activeOrderId)
+        );
+    }
+
     function validMenuData() {
       return request.resource.data.keys().hasOnly(['name', 'category', 'imageUrl', 'price', 'available', 'enabled', 'sortOrder', 'updatedAt']) &&
         validName(request.resource.data.name, 80) &&
@@ -155,9 +165,7 @@ service cloud.firestore {
       allow list: if false;
       allow create: if validUsername(username) && validStudentData();
       allow update: if validUsername(username) &&
-        validStudentData() &&
-        request.resource.data.pin == resource.data.pin &&
-        request.resource.data.createdAt == resource.data.createdAt &&
+        validStudentOrderPointerUpdate() &&
         request.resource.data.diff(resource.data).changedKeys().hasOnly(['activeOrderId']);
       allow delete: if false;
     }
