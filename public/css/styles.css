@@ -159,6 +159,11 @@ a {
   gap: 14px;
 }
 
+.brand-cluster-student,
+.brand-cluster-admin {
+  min-width: 0;
+}
+
 .brand-mark {
   width: 56px;
   height: 56px;
@@ -223,6 +228,17 @@ p {
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.utility-area-admin {
+  gap: 8px;
+}
+
+.btn-header-menu {
+  width: auto;
+  min-height: 42px;
+  padding: 10px 14px;
+  text-decoration: none;
 }
 
 .top-nav a,
@@ -1290,44 +1306,60 @@ button {
     align-items: flex-start;
   }
 
-  .student-page .shell-top {
+  .student-page .shell-top,
+  .admin-page .shell-top {
     position: static;
   }
 
-  .student-page .app-bar {
-    padding: 14px 16px 16px;
-    border-radius: 22px;
-    gap: 12px;
-  }
-
-  .student-page .brand-mark {
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
-  }
-
-  .student-page .brand-cluster {
-    gap: 12px;
-  }
-
-  .student-page .top-nav {
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
+  .student-page .app-bar,
+  .admin-page .app-bar {
+    padding: 12px 14px 14px;
+    border-radius: 20px;
     gap: 10px;
   }
 
-  .student-page .top-nav a {
-    padding: 8px 10px;
+  .student-page .brand-mark,
+  .admin-page .brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    font-size: 0.9rem;
+  }
+
+  .student-page .brand-cluster,
+  .admin-page .brand-cluster {
+    gap: 10px;
+  }
+
+  .student-page .brand-name,
+  .admin-page .brand-name {
+    font-size: 0.68rem;
+    letter-spacing: 0.11em;
+  }
+
+  .student-page h1,
+  .admin-page h1 {
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+
+  .student-page .top-nav,
+  .admin-page .utility-area {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .student-page .top-nav a,
+  .admin-page .utility-area a {
+    padding: 7px 10px;
   }
 
   .student-page .top-nav .btn-small,
-  .student-page .top-nav .user-chip {
-    min-height: 34px;
-  }
-
-  .student-page h1 {
-    font-size: 2.5rem;
+  .student-page .top-nav .user-chip,
+  .admin-page .utility-area .btn-small {
+    min-height: 32px;
   }
 
   .basket-panel {
@@ -1491,6 +1523,24 @@ button {
 @media (max-width: 520px) {
   .app-bar {
     margin-top: 8px;
+  }
+
+  .student-page .app-bar,
+  .admin-page .app-bar {
+    padding: 10px 12px 12px;
+    gap: 8px;
+  }
+
+  .student-page h1,
+  .admin-page h1 {
+    font-size: 1.4rem;
+  }
+
+  .student-page .brand-mark,
+  .admin-page .brand-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
   }
 
   .basket-panel {
